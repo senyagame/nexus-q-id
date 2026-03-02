@@ -271,8 +271,7 @@
                 btn.disabled = true;
                 await signInWithEmailAndPassword(auth, email, pass);
                 showMsg('Успешный вход! Перенаправляем...', 'success');
-                // Тут можно сделать редирект, например:
-                // window.location.href = 'index.html';
+                window.location.href = 'index.html';
             } catch (err) {
                 showMsg('Ошибка: ' + err.message);
             } finally {
