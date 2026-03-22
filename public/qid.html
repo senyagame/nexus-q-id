@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QID | Профиль NEXUS-Q</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
     <style>
         :root {
             --accent-yellow: #ffcc00;
@@ -39,20 +42,30 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 52px; height: 52px;
+            width: 52px;
+            height: 52px;
             background: linear-gradient(135deg, var(--nexus-primary), var(--nexus-secondary));
             border-radius: 14px;
-            font-weight: 900; font-size: 28px; color: #ffffff;
+            font-weight: 900;
+            font-size: 28px;
+            color: #ffffff;
             margin-bottom: 24px;
         }
 
         .avatar-circle {
-            width: 80px; height: 80px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: #eee;
             margin: 0 auto 16px;
             overflow: hidden;
             border: 3px solid var(--accent-yellow);
+        }
+
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .info-row {
@@ -63,28 +76,64 @@
             margin-bottom: 10px;
         }
 
-        .info-label { font-size: 11px; color: #8b8e94; text-transform: uppercase; font-weight: 700; }
-        .info-value { font-size: 15px; font-weight: 500; color: #1a1a1a; }
-
-        .social-btn {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            width: 100%; padding: 14px; border: 1px solid #e5e7eb; border-radius: 14px;
-            background: white; font-weight: 600; cursor: pointer; transition: 0.2s;
+        .info-label {
+            font-size: 11px;
+            color: #8b8e94;
+            text-transform: uppercase;
+            font-weight: 700;
         }
 
-        .social-btn:hover { background: #f9fafb; }
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a1a;
+            word-break: break-all;
+        }
 
-        .btn-logout {
-            margin-top: 20px;
-            color: #ef4444;
+        .btn-main {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 600;
+            background: var(--nexus-primary);
+            color: white;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-main:hover {
+            opacity: 0.9;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            outline: none;
             font-size: 14px;
+        }
+
+        .input-field:focus {
+            border-color: var(--nexus-primary);
+        }
+
+        .tab-link {
+            font-size: 13px;
+            color: var(--nexus-primary);
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
-        .btn-logout:hover { opacity: 0.7; }
 
-        #auth-section, #profile-section { display: none; }
+        #reg-fields {
+            display: none;
+        }
+
+        #profile-section {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -93,23 +142,46 @@
         <div class="logo-box">Q</div>
 
         <div id="auth-section">
-            <h1 class="text-2xl font-bold mb-2">Войдите через QID</h1>
-            <p class="text-gray-500 mb-8">Доступ к экосистеме NEXUS-Q</p>
-            <button type="button" class="social-btn" id="btn-google">
-                <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18"> 
-                Продолжить с Google
+            <h1 id="auth-title" class="text-2xl font-bold mb-2">Войти в QID</h1>
+            <p class="text-gray-500 mb-6 text-sm">Nexus-Q Ecosystem Auth</p>
+
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div id="reg-fields">
+                    <input type="text" id="username" placeholder="Придумайте логин" class="input-field">
+                </div>
+                
+                <input type="email" id="email" placeholder="Email" class="input-field" required>
+                <input type="password" id="password" placeholder="Пароль" class="input-field" required>
+                
+                <button type="submit" id="btn-submit" class="btn-main mb-4">Войти</button>
+            </form>
+
+            <p class="text-xs text-gray-400">
+                <span id="toggle-text">Нет аккаунта?</span> 
+                <span class="tab-link" onclick="toggleAuthMode()" id="toggle-link">Создать QID</span>
+            </p>
+
+            <div class="relative flex py-6 items-center">
+                <div class="flex-grow border-t border-gray-100"></div>
+                <span class="flex-shrink mx-4 text-gray-300 text-[10px] font-bold">ИЛИ</span>
+                <div class="flex-grow border-t border-gray-100"></div>
+            </div>
+
+            <button type="button" class="flex items-center justify-center gap-3 w-full p-3 border rounded-xl font-medium hover:bg-gray-50 transition" onclick="loginWithGoogle()">
+                <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18">
+                Google
             </button>
         </div>
 
         <div id="profile-section">
             <div class="avatar-circle">
-                <img id="user-avatar" src="" alt="" onerror="this.src='https://ui-avatars.com/api/?name=User'">
+                <img id="user-avatar" src="" alt="">
             </div>
-            <h1 class="text-xl font-bold mb-6">Настройки QID</h1>
+            <h1 class="text-xl font-bold mb-6">Профиль QID</h1>
 
             <div class="info-row">
-                <div class="info-label">Имя</div>
-                <div id="user-name" class="info-value">—</div>
+                <div class="info-label">Логин (Username)</div>
+                <div id="display-name" class="info-value text-indigo-600">@—</div>
             </div>
 
             <div class="info-row">
@@ -118,59 +190,86 @@
             </div>
 
             <div class="info-row">
-                <div class="info-label">Статус ID</div>
-                <div class="info-value text-green-600">Активен (Verified)</div>
+                <div class="info-label">Nexus ID</div>
+                <div id="user-id" class="info-value text-[10px] opacity-40">—</div>
             </div>
 
-            <button id="btn-logout" class="btn-logout">Выйти из аккаунта</button>
+            <button onclick="logout()" class="mt-6 text-red-500 text-sm font-bold hover:opacity-70 transition">Выйти</button>
         </div>
     </div>
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
+            authDomain: "nexus-q-ceb47.firebaseapp.com",
+            projectId: "nexus-q-ceb47",
+            storageBucket: "nexus-q-ceb47.firebasestorage.app",
+            messagingSenderId: "1089083193362",
+            appId: "1:1089083193362:web:77d047bc1770f14d7080cb"
+        };
 
-        const supabaseUrl = 'https://vfynermzgdtqmvnbzkah.supabase.co'; 
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeW5lcm16Z2R0cW12bmJ6a2FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2OTg3NTksImV4cCI6MjA4ODI3NDc1OX0.dM9nBDrEYctP8sNJiUTV4lczM_sq0G480-IQt6fw094'; 
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-        const authSection = document.getElementById('auth-section');
-        const profileSection = document.getElementById('profile-section');
+        let isLoginMode = true;
 
-        // Функция обновления интерфейса
-        async function updateUI() {
-            const { data: { session } } = await supabase.auth.getSession();
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Войти в QID" : "Создать QID";
+            document.getElementById('btn-submit').innerText = isLoginMode ? "Войти" : "Зарегистрироваться";
+            document.getElementById('reg-fields').style.display = isLoginMode ? "none" : "block";
+            document.getElementById('toggle-text').innerText = isLoginMode ? "Нет аккаунта?" : "Уже есть аккаунт?";
+            document.getElementById('toggle-link').innerText = isLoginMode ? "Создать QID" : "Войти";
+        }
 
-            if (session) {
-                const user = session.user;
-                authSection.style.display = 'none';
-                profileSection.style.display = 'block';
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
 
-                // Заполняем данные из метаданных Google
-                document.getElementById('user-name').textContent = user.user_metadata.full_name || 'Пользователь NEXUS';
-                document.getElementById('user-email').textContent = user.email;
-                document.getElementById('user-avatar').src = user.user_metadata.avatar_url || '';
-            } else {
-                authSection.style.display = 'block';
-                profileSection.style.display = 'none';
+            try {
+                if (isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } else {
+                    const result = await auth.createUserWithEmailAndPassword(email, password);
+                    // Сохраняем логин в профиль пользователя Firebase
+                    await result.user.updateProfile({
+                        displayName: username
+                    });
+                    location.reload(); // Перезагружаем, чтобы данные обновились
+                }
+            } catch (error) {
+                alert(error.message);
             }
         }
 
-        // Вход через Google
-        document.getElementById('btn-google').addEventListener('click', async () => {
-            await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: window.location.origin }
-            });
-        });
+        async function loginWithGoogle() {
+            try {
+                await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+            } catch (error) {
+                alert(error.message);
+            }
+        }
 
-        // Выход
-        document.getElementById('btn-logout').addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.reload(); // Перезагружаем, чтобы сбросить UI
-        });
+        function logout() {
+            auth.signOut();
+        }
 
-        // Запуск проверки при загрузке
-        updateUI();
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('profile-section').style.display = 'block';
+                
+                document.getElementById('display-name').innerText = user.displayName ? `@${user.displayName}` : '@nexus_user';
+                document.getElementById('user-email').innerText = user.email;
+                document.getElementById('user-id').innerText = user.uid;
+                document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=6366f1&color=fff`;
+            } else {
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('profile-section').style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
