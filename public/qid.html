@@ -5,16 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QID | Dashboard NEXUS-Q</title>
 
-    <!-- UI Frameworks & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -40,7 +35,6 @@
 
         * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* Animations */
         .view-transition {
             animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -50,7 +44,6 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* Auth Background */
         .hero-gradient {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
             position: relative;
@@ -65,7 +58,6 @@
             pointer-events: none;
         }
 
-        /* Form Inputs */
         .input-nexus {
             border: 1.5px solid var(--slate-200);
             background-color: #ffffff;
@@ -81,7 +73,6 @@
             outline: none;
         }
 
-        /* Buttons */
         .btn-nexus {
             background: linear-gradient(to right, var(--nexus-primary), var(--nexus-secondary));
             box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
@@ -99,7 +90,6 @@
             box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4);
         }
 
-        /* Sidebar */
         .sidebar-item {
             display: flex;
             align-items: center;
@@ -119,7 +109,6 @@
             color: var(--nexus-primary);
         }
 
-        /* Cards */
         .dashboard-card {
             background: #ffffff;
             border-radius: 28px;
@@ -139,7 +128,6 @@
         }
         .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Modal */
         .modal-overlay {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(8px);
@@ -160,9 +148,6 @@
 </head>
 <body>
 
-    <!-- ========================================== -->
-    <!-- VIEW: AUTHENTICATION                       -->
-    <!-- ========================================== -->
     <div id="auth-view" class="min-h-screen flex flex-col md:flex-row hidden-view">
         <div class="hidden md:flex md:w-1/2 hero-gradient p-16 flex-col justify-between text-white relative">
             <div class="view-transition">
@@ -185,7 +170,6 @@
                     </p>
                 </div>
             </div>
-            <!-- Блок с количеством пользователей удален -->
         </div>
 
         <div class="w-full md:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
@@ -211,22 +195,10 @@
                         <button onclick="switchAuthMode()" id="toggle-btn" class="text-indigo-600 font-bold hover:underline ml-1 transition">Создать QID</button>
                     </p>
                 </div>
-                <div class="relative flex items-center my-10">
-                    <div class="flex-grow border-t border-slate-100"></div>
-                    <span class="flex-shrink mx-6 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">Продолжить через</span>
-                    <div class="flex-grow border-t border-slate-100"></div>
-                </div>
-                <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 p-4 border-2 border-slate-100 rounded-2xl font-bold text-sm text-slate-700 hover:bg-slate-50 transition-all">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="20" alt="G">
-                    Google Account
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- VIEW: DASHBOARD                            -->
-    <!-- ========================================== -->
     <div id="dashboard-view" class="min-h-screen flex flex-col hidden-view">
         <header class="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-50">
             <div class="flex items-center gap-3">
@@ -245,7 +217,6 @@
         <div class="flex flex-1 overflow-hidden">
             <aside class="hidden lg:flex w-72 bg-white border-r border-slate-100 p-6 flex-col justify-between">
                 <div class="space-y-2">
-                    <!-- Оставлен только "Мой профиль", остальные удалены -->
                     <div class="sidebar-item active">
                         <i data-lucide="user" class="w-5 h-5"></i>
                         Мой профиль
@@ -327,7 +298,6 @@
         </div>
     </div>
 
-    <!-- MODAL -->
     <div id="edit-modal" class="fixed inset-0 z-[100] modal-overlay hidden flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-md rounded-[32px] p-10 shadow-2xl modal-content relative">
             <button onclick="closeEditModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-900">
@@ -351,7 +321,6 @@
         </div>
     </div>
 
-    <!-- LOADER -->
     <div id="app-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
         <div class="w-14 h-14 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
         <p class="text-slate-500 font-bold tracking-widest uppercase text-[10px]">Nexus Auth System</p>
@@ -359,25 +328,12 @@
 
     <script>
         /**
-         * INITIALIZATION
+         * SUPABASE CONFIGURATION
          */
-        const firebaseConfig = {
-            apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
-            authDomain: "nexus-q-ceb47.firebaseapp.com",
-            projectId: "nexus-q-ceb47",
-            storageBucket: "nexus-q-ceb47.firebasestorage.app",
-            messagingSenderId: "1089083193362",
-            appId: "1:1089083193362:web:77d047bc1770f14d7080cb"
-        };
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexus-q-qid';
-        firebase.initializeApp(firebaseConfig);
+        const SUPABASE_URL = 'https://vfynermzgdtqmvnbzkah.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_jvYqjTwOcCvBHj7-3IU6mQ_iyOFesK9';
         
-        const auth = firebase.auth();
-        // Используем твою базу nexusqid
-        const db = firebase.app().firestore("nexusqid"); 
-        
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const UI = {
             auth: document.getElementById('auth-view'),
@@ -409,28 +365,34 @@
                 document.getElementById('toggle-btn').innerText = isL ? "Создать QID" : "Войти";
                 document.getElementById('toggle-label').innerText = isL ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
             },
+            /**
+             * Supabase: Синхронизация данных профиля
+             */
             syncProfile: async (user, extra = {}) => {
-                const username = (extra.username || user.displayName || user.email.split('@')[0])
+                const username = (extra.username || user.user_metadata?.username || user.email.split('@')[0])
                                   .toLowerCase().replace(/[^a-z0-9]/g, '');
-                const fullName = extra.fullName || user.displayName || 'Пользователь Nexus';
+                const fullName = extra.fullName || user.user_metadata?.full_name || 'Пользователь Nexus';
                 
-                const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
-                
-                try {
-                    await profileRef.set({
-                        id: user.uid,
-                        updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                const { error } = await client
+                    .from('profiles')
+                    .upsert({
+                        id: user.id,
                         username: username,
                         full_name: fullName,
-                        avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${username}&background=6366f1&color=fff&bold=true`,
-                        email: user.email
-                    }, { merge: true });
-                    return true;
-                } catch (e) {
-                    console.error("Firestore sync error:", e);
+                        avatar_url: `https://ui-avatars.com/api/?name=${username}&background=6366f1&color=fff&bold=true`,
+                        email: user.email,
+                        updated_at: new Date().toISOString()
+                    });
+
+                if (error) {
+                    console.error("Supabase Sync Error:", error.message);
                     return false;
                 }
+                return true;
             },
+            /**
+             * Supabase: Обработка формы логина/регистрации
+             */
             handleForm: async (e) => {
                 e.preventDefault();
                 UI.showLoader();
@@ -438,21 +400,30 @@
                 const pass = document.getElementById('auth-password').value;
                 const user = document.getElementById('reg-username').value;
                 const name = document.getElementById('reg-fullname').value;
+
                 try {
                     if (AuthManager.isLogin) {
-                        await auth.signInWithEmailAndPassword(email, pass);
+                        const { error } = await client.auth.signInWithPassword({ email, password: pass });
+                        if (error) throw error;
                     } else {
-                        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                        await cred.user.updateProfile({ displayName: user });
-                        await AuthManager.syncProfile(cred.user, { username: user, fullName: name });
+                        const { data, error } = await client.auth.signUp({ 
+                            email, 
+                            password: pass,
+                            options: { data: { username: user, full_name: name } }
+                        });
+                        if (error) throw error;
+                        if (data.user) await AuthManager.syncProfile(data.user, { username: user, fullName: name });
                     }
-                } catch (err) { alert("Ошибка: " + err.message); UI.hideLoader(); }
+                } catch (err) { 
+                    alert("Ошибка: " + err.message); 
+                    UI.hideLoader(); 
+                }
             },
-            google: async () => {
-                try { await auth.signInWithPopup(googleProvider); } 
-                catch (err) { if (err.code !== 'auth/popup-closed-by-user') alert(err.message); }
-            },
-            logout: async () => { UI.showLoader(); await auth.signOut(); window.location.reload(); }
+            logout: async () => { 
+                UI.showLoader(); 
+                await client.auth.signOut(); 
+                window.location.reload(); 
+            }
         };
 
         window.openEditModal = () => {
@@ -461,15 +432,17 @@
             UI.modal.classList.remove('hidden');
         };
         window.closeEditModal = () => UI.modal.classList.add('hidden');
+        
         window.handleUpdateProfile = async (e) => {
             e.preventDefault();
             UI.showLoader();
-            const success = await AuthManager.syncProfile(auth.currentUser, {
+            const { data: { user } } = await client.auth.getUser();
+            const success = await AuthManager.syncProfile(user, {
                 username: document.getElementById('edit-username').value,
                 fullName: document.getElementById('edit-fullname').value
             });
             if (success) {
-                await loadDashboard(auth.currentUser);
+                await loadDashboard(user);
                 window.closeEditModal();
             }
             UI.hideLoader();
@@ -477,50 +450,61 @@
 
         window.copyUid = () => {
             const uid = document.getElementById('dash-uid').innerText;
-            const temp = document.createElement('textarea');
-            temp.value = uid;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            
-            const btn = document.querySelector('[onclick="copyUid()"]');
-            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>';
-            lucide.createIcons();
-            setTimeout(() => { btn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>'; lucide.createIcons(); }, 2000);
+            navigator.clipboard.writeText(uid).then(() => {
+                const btn = document.querySelector('[onclick="copyUid()"]');
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>';
+                lucide.createIcons();
+                setTimeout(() => { btn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>'; lucide.createIcons(); }, 2000);
+            });
         };
 
+        /**
+         * Supabase: Загрузка данных из таблицы profiles
+         */
         async function loadDashboard(user) {
-            const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
             try {
-                const doc = await profileRef.get();
-                let data = doc.exists ? doc.data() : null;
-                if (!data) {
+                const { data, error } = await client
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                let profile = data;
+                if (!profile) {
                     await AuthManager.syncProfile(user);
-                    const fresh = await profileRef.get();
-                    data = fresh.data();
+                    const { data: fresh } = await client.from('profiles').select('*').eq('id', user.id).single();
+                    profile = fresh;
                 }
-                if (data) {
-                    document.getElementById('nav-username').innerText = "@" + data.username;
-                    document.getElementById('dash-username').innerText = "@" + data.username;
-                    document.getElementById('dash-fullname').innerText = data.full_name || 'Не указано';
-                    document.getElementById('dash-email').innerText = data.email;
-                    document.getElementById('dash-uid').innerText = data.id;
-                    document.getElementById('nav-avatar').src = data.avatar_url;
-                    document.getElementById('dash-avatar').src = data.avatar_url;
+
+                if (profile) {
+                    document.getElementById('nav-username').innerText = "@" + profile.username;
+                    document.getElementById('dash-username').innerText = "@" + profile.username;
+                    document.getElementById('dash-fullname').innerText = profile.full_name || 'Не указано';
+                    document.getElementById('dash-email').innerText = profile.email;
+                    document.getElementById('dash-uid').innerText = profile.id;
+                    document.getElementById('nav-avatar').src = profile.avatar_url;
+                    document.getElementById('dash-avatar').src = profile.avatar_url;
                 }
                 UI.render(true);
-            } catch (e) { console.error(e); UI.render(true); }
+            } catch (e) { 
+                console.error(e); 
+                UI.render(true); 
+            }
         }
 
-        auth.onAuthStateChanged(user => {
-            if (user) loadDashboard(user);
-            else UI.render(false);
+        /**
+         * Supabase: Отслеживание состояния сессии
+         */
+        client.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                loadDashboard(session.user);
+            } else {
+                UI.render(false);
+            }
         });
 
         window.switchAuthMode = AuthManager.toggleMode;
         window.handleAuthSubmit = AuthManager.handleForm;
-        window.signInWithGoogle = AuthManager.google;
         window.globalLogout = AuthManager.logout;
         lucide.createIcons();
     </script>
