@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QID | Профиль NEXUS-Q</title>
 
+    <!-- Подключение Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Подключение шрифта Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDK (Authentification) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     
+    <!-- Supabase SDK (Database) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- Yandex ID SDK -->
     <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
 
     <style>
@@ -32,15 +37,19 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .auth-card {
             background: #ffffff;
             border-radius: 28px;
-            width: 420px;
+            width: 100%;
+            max-width: 420px;
             padding: 40px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
             text-align: center;
+            transition: all 0.3s ease;
+            min-height: 200px; /* Чтобы карточка не схлопывалась */
         }
 
         .logo-box {
@@ -65,6 +74,7 @@
             margin: 0 auto 16px;
             overflow: hidden;
             border: 3px solid var(--accent-yellow);
+            position: relative;
         }
 
         .avatar-circle img {
@@ -79,6 +89,12 @@
             padding: 12px 16px;
             border-radius: 12px;
             margin-bottom: 10px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .info-row:hover {
+            border-color: #e5e7eb;
         }
 
         .info-label {
@@ -86,6 +102,7 @@
             color: #8b8e94;
             text-transform: uppercase;
             font-weight: 700;
+            letter-spacing: 0.05em;
         }
 
         .info-value {
@@ -103,11 +120,12 @@
             border-radius: 12px;
             outline: none;
             font-size: 14px;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
 
         .input-field:focus {
             border-color: var(--nexus-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
 
         .btn-main {
@@ -124,17 +142,50 @@
 
         .btn-main:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        #auth-section, #profile-section, #reg-fields-container {
-            display: none;
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            background: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .social-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
         }
 
         #buttonContainerId {
-            margin-top: 12px;
+            margin-top: 10px;
             display: flex;
             justify-content: center;
             width: 100%;
+            min-height: 44px;
+        }
+
+        /* Анимации */
+        #auth-section, #profile-section {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden-section {
+            display: none !important;
         }
     </style>
 </head>
@@ -143,17 +194,18 @@
     <div class="auth-card">
         <div class="logo-box">Q</div>
 
+        <!-- СЕКЦИЯ АВТОРИЗАЦИИ (ВИДНА ПО УМОЛЧАНИЮ) -->
         <div id="auth-section">
             <h1 id="auth-title" class="text-2xl font-bold mb-2">Войти в QID</h1>
-            <p class="text-gray-500 mb-6 text-sm">Nexus-Q Ecosystem Auth</p>
+            <p id="auth-desc" class="text-gray-500 mb-8 text-sm">Nexus-Q Ecosystem Auth</p>
 
-            <form id="auth-form">
-                <div id="reg-fields-container">
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div id="reg-fields-container" class="hidden-section">
                     <input type="text" id="reg-username" placeholder="Придумайте логин" class="input-field">
                     <input type="text" id="reg-fullname" placeholder="Ваше полное имя" class="input-field">
                 </div>
                 
-                <input type="email" id="auth-email" placeholder="Email" class="input-field" required>
+                <input type="email" id="auth-email" placeholder="Email адрес" class="input-field" required>
                 <input type="password" id="auth-password" placeholder="Пароль" class="input-field" required>
                 
                 <button type="submit" id="btn-submit-form" class="btn-main mb-4">Войти</button>
@@ -166,53 +218,56 @@
 
             <div class="relative flex py-4 items-center">
                 <div class="flex-grow border-t border-gray-100"></div>
-                <span class="flex-shrink mx-4 text-gray-300 text-[10px] font-bold uppercase tracking-widest">ИЛИ</span>
+                <span class="flex-shrink mx-4 text-gray-300 text-[10px] font-bold uppercase tracking-widest">Или войти через</span>
                 <div class="flex-grow border-t border-gray-100"></div>
             </div>
 
             <div class="flex flex-col gap-2 mt-2">
-                <button type="button" class="flex items-center justify-center gap-3 w-full p-3 border border-gray-200 rounded-[20px] font-semibold text-sm hover:bg-gray-50 transition" onclick="signInWithGoogle()">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18"> Google
+                <button type="button" class="social-btn" onclick="signInWithGoogle()">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18" alt="G">
+                    Продолжить с Google
                 </button>
                 
+                <!-- ВОТ ЗДЕСЬ ДОЛЖЕН БЫТЬ ЯНДЕКС -->
                 <div id="buttonContainerId"></div>
             </div>
         </div>
 
-        <div id="profile-section">
+        <!-- СЕКЦИЯ ПРОФИЛЯ -->
+        <div id="profile-section" class="hidden-section">
             <div class="avatar-circle">
                 <img id="user-avatar-img" src="" alt="Avatar">
             </div>
             <h1 class="text-xl font-bold mb-6">Профиль QID</h1>
 
             <div class="info-row">
-                <div class="info-label">Username</div>
+                <div class="info-label">Логин / Никнейм</div>
                 <div id="profile-display-name" class="info-value text-indigo-600">@—</div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Full Name</div>
+                <div class="info-label">Полное имя</div>
                 <div id="profile-full-name" class="info-value">—</div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Email</div>
+                <div class="info-label">Email адрес</div>
                 <div id="profile-email" class="info-value">—</div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">ID (UUID)</div>
+                <div class="info-label">Nexus ID (UUID)</div>
                 <div id="profile-uid" class="info-value text-[10px] opacity-40">—</div>
             </div>
 
-            <button id="btn-global-logout" class="mt-8 text-red-500 text-sm font-bold hover:opacity-70 transition cursor-pointer">
+            <button onclick="globalLogout()" class="mt-8 text-red-500 text-sm font-bold hover:opacity-70 transition cursor-pointer">
                 Выйти из системы
             </button>
         </div>
     </div>
 
     <script>
-        // 1. КОНФИГУРАЦИЯ
+        // --- 1. КОНФИГУРАЦИЯ ---
         const firebaseConfig = {
             apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
             authDomain: "nexus-q-ceb47.firebaseapp.com",
@@ -225,72 +280,41 @@
         const supabaseUrl = 'https://vfynermzgdtqmvnbzkah.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeW5lcm16Z2R0cW12bmJ6a2FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2OTg3NTksImV4cCI6MjA4ODI3NDc1OX0.dM9nBDrEYctP8sNJiUTV4lczM_sq0G480-IQt6fw094';
 
-        // Инициализация сервисов
+        // Инициализация
         firebase.initializeApp(firebaseConfig);
         const fbAuth = firebase.auth();
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-        // 2. СИНХРОНИЗАЦИЯ С ТАБЛИЦЕЙ PROFILES
-        async function syncToSupabase(user, username = '', fullName = '') {
-            const { error } = await supabase
-                .from('profiles')
-                .upsert({
-                    id: user.uid || user.id, // UID из Firebase или ID из Supabase
+        // --- 2. СИНХРОНИЗАЦИЯ С БАЗОЙ ---
+        async function syncProfileToSupabase(user, customUsername = '', fullName = '') {
+            try {
+                await supabaseClient.from('profiles').upsert({
+                    id: user.uid,
                     updated_at: new Date(),
-                    username: username || user.displayName || user.email.split('@')[0],
+                    username: customUsername || user.displayName || user.email.split('@')[0],
                     full_name: fullName || user.displayName || '',
-                    avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=6366f1&color=fff`
+                    avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=6366f1&color=fff&bold=true`
                 });
-
-            if (error) console.error('Ошибка синхронизации Profiles:', error);
+            } catch (err) {
+                console.error('Ошибка БД:', err.message);
+            }
         }
 
-        // 3. ИНИЦИАЛИЗАЦИЯ ЯНДЕКСА (SDK)
-        window.onload = function() {
-            // Твой Redirect URL для Supabase
-            const supabaseRedirect = "https://vfynermzgdtqmvnbzkah.supabase.co/auth/v1/callback";
-
-            window.YaAuthSuggest.init(
-                {
-                    client_id: "7b84bc72719444d9bc04d72106619f4a",
-                    response_type: "code", // Для Supabase лучше использовать code
-                    redirect_uri: supabaseRedirect
-                },
-                window.location.origin,
-                {
-                    view: "button",
-                    parentId: "buttonContainerId",
-                    buttonSize: 'm',
-                    buttonView: 'main',
-                    buttonTheme: 'light',
-                    buttonBorderRadius: "20",
-                    buttonIcon: 'ya',
-                }
-            )
-            .then(result => result.handler())
-            .then(async data => {
-                // Если Яндекс вернул данные, инициируем вход через OAuth в Supabase
-                const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'yandex',
-                    options: { redirectTo: window.location.href }
-                });
-                if (error) console.error('Supabase Yandex Error:', error.message);
-            })
-            .catch(err => console.log('Yandex SDK Error:', err));
-        };
-
-        // 4. ЛОГИКА АВТОРИЗАЦИИ (FIREBASE)
+        // --- 3. ИНТЕРФЕЙС ---
         let isLoginMode = true;
+
         function switchAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById('auth-title').innerText = isLoginMode ? "Войти в QID" : "Создать QID";
             document.getElementById('btn-submit-form').innerText = isLoginMode ? "Войти" : "Зарегистрироваться";
-            document.getElementById('reg-fields-container').style.display = isLoginMode ? "none" : "block";
+            document.getElementById('reg-fields-container').classList.toggle('hidden-section');
+            document.getElementById('toggle-text-label').innerText = isLoginMode ? "Нет аккаунта?" : "Уже есть аккаунт?";
             document.getElementById('toggle-link-btn').innerText = isLoginMode ? "Создать QID" : "Войти";
         }
 
-        document.getElementById('auth-form').onsubmit = async (e) => {
-            e.preventDefault();
+        // --- 4. ЛОГИКА АВТОРИЗАЦИИ ---
+        async function handleAuthSubmit(event) {
+            event.preventDefault();
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const username = document.getElementById('reg-username').value;
@@ -302,59 +326,96 @@
                 } else {
                     const res = await fbAuth.createUserWithEmailAndPassword(email, password);
                     await res.user.updateProfile({ displayName: username });
-                    await syncToSupabase(res.user, username, fullname);
+                    await syncProfileToSupabase(res.user, username, fullname);
                     window.location.reload();
                 }
             } catch (err) { alert(err.message); }
-        };
+        }
 
         async function signInWithGoogle() {
             try {
                 const res = await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-                await syncToSupabase(res.user);
+                await syncProfileToSupabase(res.user);
             } catch (err) { alert(err.message); }
         }
 
-        // 5. ВЫХОД (ГЛОБАЛЬНЫЙ)
-        document.getElementById('btn-global-logout').onclick = async () => {
+        // --- ЯНДЕКС АЙДИ (SDK) ---
+        function initYandexSuggest() {
+            if (!window.YaAuthSuggest) {
+                console.log("SDK Яндекса еще не готов, пробуем через 500мс...");
+                setTimeout(initYandexSuggest, 500);
+                return;
+            }
+
+            console.log("Инициализация Яндекс ID...");
+            window.YaAuthSuggest.init(
+                {
+                    client_id: "7b84bc72719444d9bc04d72106619f4a",
+                    response_type: "code",
+                    redirect_uri: "https://vfynermzgdtqmvnbzkah.supabase.co/auth/v1/callback"
+                },
+                window.location.origin,
+                {
+                    view: "button",
+                    parentId: "buttonContainerId",
+                    buttonSize: 'm',
+                    buttonTheme: 'light',
+                    buttonBorderRadius: "20",
+                    buttonIcon: 'ya',
+                }
+            )
+            .then(result => result.handler())
+            .then(async data => {
+                const { error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'yandex',
+                    options: { redirectTo: window.location.href }
+                });
+                if (error) console.error(error.message);
+            })
+            .catch(e => console.log('Yandex SDK skipped or error:', e));
+        }
+
+        async function globalLogout() {
             await fbAuth.signOut();
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             window.location.reload();
-        };
+        }
 
-        // 6. СЛУШАТЕЛЬ СОСТОЯНИЯ И ЗАГРУЗКА ПРОФИЛЯ
-        async function updateProfileUI(userUid, userEmail) {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userUid)
-                .single();
-
+        // --- 5. ОТОБРАЖЕНИЕ ДАННЫХ ---
+        async function loadProfile(uid, email) {
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
             if (profile) {
                 document.getElementById('profile-display-name').innerText = "@" + profile.username;
                 document.getElementById('profile-full-name').innerText = profile.full_name || "—";
                 document.getElementById('user-avatar-img').src = profile.avatar_url;
+            } else {
+                document.getElementById('profile-display-name').innerText = "@" + email.split('@')[0];
             }
-            document.getElementById('profile-email').innerText = userEmail;
-            document.getElementById('profile-uid').innerText = userUid;
+            document.getElementById('profile-email').innerText = email;
+            document.getElementById('profile-uid').innerText = uid;
         }
 
-        // Проверка сессии Firebase
-        fbAuth.onAuthStateChanged(async user => {
+        // Основной слушатель состояния
+        fbAuth.onAuthStateChanged(async (user) => {
+            const authSec = document.getElementById('auth-section');
+            const profSec = document.getElementById('profile-section');
+
             if (user) {
-                document.getElementById('auth-section').style.display = "none";
-                document.getElementById('profile-section').style.display = "block";
-                await updateProfileUI(user.uid, user.email);
+                authSec.classList.add('hidden-section');
+                profSec.classList.remove('hidden-section');
+                await loadProfile(user.uid, user.email);
             } else {
-                // Если в Firebase нет юзера, проверяем Supabase (для Яндекса)
-                const { data: { session } } = await supabase.auth.getSession();
+                // Проверяем Supabase сессию (для Яндекса)
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
-                    document.getElementById('auth-section').style.display = "none";
-                    document.getElementById('profile-section').style.display = "block";
-                    await updateProfileUI(session.user.id, session.user.email);
+                    authSec.classList.add('hidden-section');
+                    profSec.classList.remove('hidden-section');
+                    await loadProfile(session.user.id, session.user.email);
                 } else {
-                    document.getElementById('auth-section').style.display = "block";
-                    document.getElementById('profile-section').style.display = "none";
+                    authSec.classList.remove('hidden-section');
+                    profSec.classList.add('hidden-section');
+                    // Запускаем Яндекс если мы не вошли
+                    initYandexSuggest();
                 }
             }
         });
