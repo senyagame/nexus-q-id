@@ -3,39 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QID | Профиль NEXUS-Q</title>
+    <title>QID | Dashboard NEXUS-Q</title>
 
     <!-- UI Frameworks & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Иконки для интерфейса -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- SDK для авторизации и базы данных -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
             --nexus-primary: #6366f1;
             --nexus-secondary: #a855f7;
             --accent-yellow: #ffcc00;
+            --bg-dark: #0f172a;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            background-color: #f9fafb;
+            background-color: #f8fafc;
+            overflow-x: hidden;
         }
 
-        * { transition: all 0.2s ease-in-out; }
+        * { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        .fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        /* Анимации перехода */
+        .page-transition { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Стили для фона авторизации */
         .hero-gradient {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
             position: relative;
@@ -46,27 +51,22 @@
             content: '';
             position: absolute;
             width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
             top: -150px; left: -150px;
         }
 
-        .auth-card {
-            background: #ffffff;
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-        }
-
+        /* Кастомные инпуты */
         .input-nexus {
-            border: 1.5px solid #e5e7eb;
-            background-color: #f9fafb;
+            border: 1.5px solid #e2e8f0;
+            background-color: #ffffff;
         }
         .input-nexus:focus {
             border-color: var(--nexus-primary);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            background-color: #fff;
             outline: none;
         }
 
+        /* Кнопки */
         .btn-nexus {
             background: linear-gradient(to right, var(--nexus-primary), var(--nexus-secondary));
             box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
@@ -77,108 +77,98 @@
             box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4);
         }
 
-        .hidden-section { display: none !important; }
-
-        .info-row {
-            text-align: left;
-            background: #f8f9fa;
+        /* Стили дашборда */
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 12px 16px;
             border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid transparent;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .sidebar-item:hover {
+            background-color: #f1f5f9;
+            color: var(--nexus-primary);
+        }
+        .sidebar-item.active {
+            background-color: #eff6ff;
+            color: var(--nexus-primary);
         }
 
-        .info-label {
-            font-size: 11px;
-            color: #8b8e94;
-            text-transform: uppercase;
-            font-weight: 700;
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 24px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .info-value {
-            font-size: 15px;
-            font-weight: 500;
-            color: #1a1a1a;
-        }
+        .hidden-view { display: none !important; }
 
-        .avatar-circle {
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            background: #eee;
-            margin: 0 auto 16px;
-            overflow: hidden;
-            border: 3px solid var(--accent-yellow);
-        }
-        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row">
+<body>
 
-    <!-- HERO БЛОК -->
-    <div class="hidden md:flex md:w-1/2 hero-gradient p-16 flex-col justify-between text-white relative">
-        <div class="fade-in">
-            <div class="flex items-center gap-3 mb-12">
-                <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/20">
-                    <span class="font-black text-2xl">Q</span>
+    <!-- ========================================== -->
+    <!-- VIEW: AUTHENTICATION (Split Screen)        -->
+    <!-- ========================================== -->
+    <div id="auth-view" class="min-h-screen flex flex-col md:flex-row hidden-view">
+        <!-- Левый Hero Блок -->
+        <div class="hidden md:flex md:w-1/2 hero-gradient p-16 flex-col justify-between text-white relative">
+            <div>
+                <div class="flex items-center gap-3 mb-12">
+                    <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/20">
+                        <span class="font-black text-2xl">Q</span>
+                    </div>
+                    <span class="font-bold text-2xl tracking-tighter">NEXUS-Q</span>
                 </div>
-                <span class="font-bold text-2xl tracking-tighter text-white">NEXUS-Q</span>
+                
+                <div class="space-y-8 max-w-lg">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 backdrop-blur-md">
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
+                        <span class="text-indigo-200 text-xs font-bold tracking-widest uppercase">Next Gen Ecosystem</span>
+                    </div>
+                    <h1 class="text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
+                        Будущее <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">нейросетей</span> <br>уже здесь.
+                    </h1>
+                    <p class="text-xl text-indigo-100/60 leading-relaxed font-medium">
+                        Единый QID для доступа ко всем инструментам Nexus. Просто, безопасно и невероятно быстро.
+                    </p>
+                </div>
             </div>
-            
-            <div class="space-y-8 max-w-lg">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 backdrop-blur-md">
-                    <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
-                    <span class="text-indigo-200 text-xs font-bold tracking-widest uppercase">Next Gen Ecosystem</span>
+
+            <div class="flex items-center gap-6">
+                <div class="flex -space-x-4">
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-indigo-500 flex items-center justify-center font-bold">A</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-purple-500 flex items-center justify-center font-bold">S</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-blue-500 flex items-center justify-center font-bold">N</div>
                 </div>
-                <h1 class="text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
-                    Будущее <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">нейросетей</span> <br>уже здесь.
-                </h1>
-                <p class="text-xl text-indigo-100/60 leading-relaxed font-medium">
-                    Единый QID для доступа ко всем инструментам Nexus. Просто, безопасно и невероятно быстро.
-                </p>
+                <div class="h-10 w-px bg-white/10"></div>
+                <p class="text-sm text-indigo-200/60 font-medium">Присоединяйся к 15,000+ <br>пользователей NEXUS-Q</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-6 fade-in" style="animation-delay: 0.2s;">
-            <div class="flex -space-x-4">
-                <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-indigo-500 flex items-center justify-center font-bold">A</div>
-                <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-purple-500 flex items-center justify-center font-bold">S</div>
-                <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-blue-500 flex items-center justify-center font-bold">N</div>
-            </div>
-            <div class="h-10 w-px bg-white/10"></div>
-            <p class="text-sm text-indigo-200/60 font-medium">Присоединяйся к сообществу <br>NEXUS-Q</p>
-        </div>
-    </div>
-
-    <!-- ФОРМА АВТОРИЗАЦИИ / ПРОФИЛЬ -->
-    <div class="w-full md:w-1/2 flex items-center justify-center p-6 lg:p-12">
-        <div class="auth-card w-full max-w-md p-8 lg:p-14 fade-in">
-            
-            <!-- Мобильное лого -->
-            <div class="md:hidden flex justify-center mb-10">
-                <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-2xl">Q</div>
-            </div>
-
-            <!-- ЗАГРУЗКА -->
-            <div id="loading-state" class="hidden-section flex flex-col items-center py-20">
-                <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-                <p class="text-gray-400 font-medium text-sm">Синхронизация профиля...</p>
-            </div>
-
-            <!-- СЕКЦИЯ ВХОДА -->
-            <div id="auth-section">
+        <!-- Правая Форма -->
+        <div class="w-full md:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
+            <div class="w-full max-w-md p-4 lg:p-8 page-transition">
                 <div class="text-center mb-10">
-                    <h2 id="auth-title" class="text-4xl font-black text-gray-900 mb-3 tracking-tight">Войти</h2>
-                    <p id="auth-desc" class="text-gray-400 font-medium text-sm">Добро пожаловать в Nexus-Q</p>
+                    <h2 id="auth-title" class="text-4xl font-black text-slate-900 mb-3 tracking-tight">Войти в QID</h2>
+                    <p id="auth-desc" class="text-slate-400 font-medium">Ваш пропуск в экосистему Nexus</p>
                 </div>
 
                 <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
-                    <div id="reg-fields" class="hidden-section space-y-4">
+                    <div id="reg-fields" class="hidden space-y-4">
                         <input type="text" id="reg-username" placeholder="Придумайте логин" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
                         <input type="text" id="reg-fullname" placeholder="Ваше Имя" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
                     </div>
 
                     <div class="space-y-3">
-                        <input type="email" id="auth-email" placeholder="Электронная почта" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" required>
+                        <input type="email" id="auth-email" placeholder="Email адрес" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" required>
                         <input type="password" id="auth-password" placeholder="Пароль" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" required>
                     </div>
 
@@ -188,64 +178,206 @@
                 </form>
 
                 <div class="mt-8 text-center">
-                    <p class="text-sm text-gray-400 font-medium">
+                    <p class="text-sm text-slate-400 font-medium">
                         <span id="toggle-label">Ещё нет аккаунта?</span>
                         <button onclick="switchAuthMode()" id="toggle-btn" class="text-indigo-600 font-bold hover:text-indigo-700 ml-1 transition">Создать QID</button>
                     </p>
                 </div>
 
                 <div class="relative flex items-center my-10">
-                    <div class="flex-grow border-t border-gray-100"></div>
-                    <span class="flex-shrink mx-6 text-gray-300 text-[11px] font-black uppercase tracking-[0.2em]">Social Connect</span>
-                    <div class="flex-grow border-t border-gray-100"></div>
+                    <div class="flex-grow border-t border-slate-100"></div>
+                    <span class="flex-shrink mx-6 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">Вход через соцсети</span>
+                    <div class="flex-grow border-t border-slate-100"></div>
                 </div>
 
-                <div class="space-y-4">
-                    <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 p-4 border-2 border-gray-100 rounded-2xl font-bold text-sm text-gray-700 hover:bg-gray-50 transition-all">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="20" alt="G">
-                        Google Account
-                    </button>
-                    <div id="buttonContainerId" class="w-full"></div>
+                <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 p-4 border-2 border-slate-100 rounded-2xl font-bold text-sm text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="20" alt="G">
+                    Google Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW: DASHBOARD (Expanded Profile)         -->
+    <!-- ========================================== -->
+    <div id="dashboard-view" class="min-h-screen flex flex-col hidden-view">
+        <!-- Навигация (Header) -->
+        <header class="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl">Q</div>
+                <span class="font-bold text-xl text-slate-900">NEXUS-Q <span class="text-indigo-500 font-medium ml-1">Dashboard</span></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-indigo-500 hover:bg-indigo-50">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                </button>
+                <div class="h-8 w-px bg-slate-100 mx-2"></div>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p id="nav-username" class="text-sm font-bold text-slate-900">@user</p>
+                        <p class="text-[10px] font-bold text-green-500 uppercase tracking-widest">Verified</p>
+                    </div>
+                    <img id="nav-avatar" src="" class="w-10 h-10 rounded-full border-2 border-indigo-500 p-0.5 object-cover" alt="User">
                 </div>
             </div>
+        </header>
 
-            <!-- СЕКЦИЯ ПРОФИЛЯ -->
-            <div id="profile-section" class="hidden-section">
-                <div class="text-center mb-10">
-                    <div class="avatar-circle">
-                        <img id="user-avatar" src="" alt="Avatar">
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Сайдбар -->
+            <aside class="hidden lg:flex w-72 bg-white border-r border-slate-100 p-6 flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="sidebar-item active">
+                        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                        Обзор профиля
                     </div>
-                    <h2 class="text-3xl font-black text-gray-900 mb-1 tracking-tight">Ваш QID</h2>
-                    <p class="text-indigo-500 text-sm font-bold uppercase tracking-widest">Nexus Active Profile</p>
+                    <div class="sidebar-item">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                        Мои Нейросети
+                    </div>
+                    <div class="sidebar-item">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        Безопасность
+                    </div>
+                    <div class="sidebar-item">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        Подписки & Платежи
+                    </div>
+                    <div class="sidebar-item">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        Настройки QID
+                    </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="info-row">
-                        <p class="info-label">Логин</p>
-                        <p id="p-username" class="info-value text-indigo-600 font-bold">@—</p>
-                    </div>
-                    <div class="info-row">
-                        <p class="info-label">Имя</p>
-                        <p id="p-fullname" class="info-value">—</p>
-                    </div>
-                    <div class="info-row">
-                        <p class="info-label">Email</p>
-                        <p id="p-email" class="info-value">—</p>
-                    </div>
-                </div>
+                <button onclick="globalLogout()" class="sidebar-item text-red-500 hover:bg-red-50 hover:text-red-600">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    Выйти из системы
+                </button>
+            </aside>
 
-                <div class="mt-10 pt-6 border-t border-gray-50 flex flex-col gap-4">
-                    <button onclick="globalLogout()" class="w-full p-4 border-2 border-red-50 rounded-2xl text-red-500 font-bold text-sm hover:bg-red-50 transition-all">
-                        Выйти из системы
-                    </button>
-                    <p class="text-center text-[10px] text-gray-300 font-bold uppercase tracking-widest">Nexus ID: <span id="p-uid">—</span></p>
-                </div>
-            </div>
+            <!-- Основной контент -->
+            <main class="flex-1 overflow-y-auto p-6 lg:p-10 bg-slate-50/50">
+                <div class="max-w-5xl mx-auto space-y-8 page-transition">
+                    
+                    <!-- Приветствие -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <h1 class="text-3xl font-black text-slate-900 tracking-tight">С возвращением, <span id="hello-name">Сень</span>!</h1>
+                            <p class="text-slate-500 font-medium">Ваш расширенный Nexus ID готов к работе.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button class="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition">Изменить профиль</button>
+                            <button class="px-6 py-3 btn-nexus text-white rounded-2xl text-sm font-bold shadow-lg">Запустить QAI</button>
+                        </div>
+                    </div>
 
+                    <!-- Сетка карточек -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Основная информация -->
+                        <div class="md:col-span-2 dashboard-card p-8 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-8 opacity-5">
+                                <i data-lucide="user" class="w-32 h-32"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                <i data-lucide="id-card" class="w-5 h-5 text-indigo-500"></i>
+                                Данные аккаунта
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                <div>
+                                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Никнейм</p>
+                                    <p id="dash-username" class="text-xl font-bold text-indigo-600 tracking-tight">@username</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Полное имя</p>
+                                    <p id="dash-fullname" class="text-xl font-bold text-slate-900 tracking-tight">Имя Фамилия</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Основная почта</p>
+                                    <p id="dash-email" class="text-lg font-medium text-slate-600">email@example.com</p>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nexus ID</p>
+                                    <p id="dash-uid" class="text-[13px] font-mono text-slate-400 truncate">UUID-TOKEN-ID</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Статистика / Баланс -->
+                        <div class="dashboard-card p-8 flex flex-col justify-between bg-indigo-600 text-white">
+                            <div>
+                                <h3 class="text-lg font-bold opacity-80 mb-2">Q-Tokens</h3>
+                                <p class="text-5xl font-black tracking-tighter">1,240 <span class="text-xl font-bold opacity-60">QT</span></p>
+                            </div>
+                            <div class="mt-8 pt-8 border-t border-white/10">
+                                <button class="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl font-bold text-sm transition">Пополнить баланс</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Дополнительные секции -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="dashboard-card p-8">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <i data-lucide="activity" class="w-5 h-5 text-indigo-500"></i>
+                                Недавняя активность
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="check" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-900">Вход в систему</p>
+                                        <p class="text-[11px] text-slate-400">Сегодня, 14:20 • IP 192.168.1.1</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="plus" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-900">Создание аккаунта QID</p>
+                                        <p class="text-[11px] text-slate-400">Вчера, 10:15 • Nexus Core</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card p-8">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <i data-lucide="link" class="w-5 h-5 text-indigo-500"></i>
+                                Привязанные сервисы
+                            </h3>
+                            <div class="flex flex-wrap gap-3">
+                                <div class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-xs font-bold text-slate-600 flex items-center gap-2">
+                                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" class="w-4" alt="">
+                                    Google Active
+                                </div>
+                                <div class="px-4 py-2 bg-slate-50 border border-slate-200 border-dashed rounded-full text-xs font-bold text-slate-300 flex items-center gap-2">
+                                    GitHub Connect
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ИНДИКАТОР ЗАГРУЗКИ (Overlay) -->
+    <div id="app-loading" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+        <div class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-sm">Q</span>
+            <p class="text-slate-400 font-bold tracking-widest uppercase text-xs">Nexus Authorization System</p>
         </div>
     </div>
 
     <script>
+        /**
+         * 1. КОНФИГУРАЦИЯ И ИНИЦИАЛИЗАЦИЯ
+         */
         const CONFIG = {
             FIREBASE: {
                 apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
@@ -254,82 +386,82 @@
                 storageBucket: "nexus-q-ceb47.firebasestorage.app",
                 messagingSenderId: "1089083193362",
                 appId: "1:1089083193362:web:77d047bc1770f14d7080cb"
-            },
-            SUPABASE: {
-                url: 'https://vfynermzgdtqmvnbzkah.supabase.co',
-                key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeW5lcm16Z2R0cW12bmJ6a2FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2OTg3NTksImV4cCI6MjA4ODI3NDc1OX0.dM9nBDrEYctP8sNJiUTV4lczM_sq0G480-IQt6fw094'
-            },
-            YANDEX: {
-                clientId: "7b84bc72719444d9bc04d72106619f4a",
-                redirectUri: "https://vfynermzgdtqmvnbzkah.supabase.co/auth/v1/callback"
             }
         };
 
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexus-q-qid';
+        
         firebase.initializeApp(CONFIG.FIREBASE);
-        const fbAuth = firebase.auth();
+        const auth = firebase.auth();
+        const db = firebase.firestore();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
-        const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE.url, CONFIG.SUPABASE.key);
 
+        /**
+         * 2. УТИЛИТЫ И UI
+         */
         const UI = {
-            authSec: document.getElementById('auth-section'),
-            profSec: document.getElementById('profile-section'),
-            loading: document.getElementById('loading-state'),
-            showLoading: () => { 
-                UI.loading.classList.remove('hidden-section'); 
-                UI.authSec.classList.add('hidden-section'); 
-                UI.profSec.classList.add('hidden-section'); 
-            },
-            hideLoading: () => { 
-                UI.loading.classList.add('hidden-section'); 
-            },
-            toggleView: (isLoggedIn) => {
-                UI.hideLoading();
+            authView: document.getElementById('auth-view'),
+            dashView: document.getElementById('dashboard-view'),
+            loader: document.getElementById('app-loading'),
+
+            showLoading: () => UI.loader.classList.remove('hidden-view'),
+            hideLoading: () => UI.loader.classList.add('hidden-view'),
+
+            switchView: (isLoggedIn) => {
                 if (isLoggedIn) {
-                    UI.authSec.classList.add('hidden-section');
-                    UI.profSec.classList.remove('hidden-section');
+                    UI.authView.classList.add('hidden-view');
+                    UI.dashView.classList.remove('hidden-view');
                 } else {
-                    UI.authSec.classList.remove('hidden-section');
-                    UI.profSec.classList.add('hidden-section');
+                    UI.authView.classList.remove('hidden-view');
+                    UI.dashView.classList.add('hidden-view');
                 }
+                UI.hideLoading();
+                lucide.createIcons(); // Обновляем иконки Lucide
             }
         };
 
+        /**
+         * 3. ЛОГИКА АВТОРИЗАЦИИ (SYSTEM CORE)
+         */
         const AuthManager = {
             isLoginMode: true,
 
             switchMode: () => {
                 AuthManager.isLoginMode = !AuthManager.isLoginMode;
-                document.getElementById('auth-title').innerText = AuthManager.isLoginMode ? "Войти" : "Создать QID";
-                document.getElementById('reg-fields').classList.toggle('hidden-section');
-                document.getElementById('toggle-btn').innerText = AuthManager.isLoginMode ? "Создать QID" : "Войти";
+                const isL = AuthManager.isLoginMode;
+                document.getElementById('auth-title').innerText = isL ? "Войти в QID" : "Создать QID";
+                document.getElementById('reg-fields').classList.toggle('hidden');
+                document.getElementById('toggle-btn').innerText = isL ? "Создать QID" : "Войти";
+                document.getElementById('toggle-label').innerText = isL ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
             },
 
-            // Системная синхронизация с Supabase
-            syncProfile: async (user, data = {}) => {
-                console.log("AuthSystem: Синхронизация данных...");
-                const username = (data.username || user.displayName || user.email.split('@')[0]).toLowerCase();
-                const fullName = data.fullName || user.displayName || '';
-
-                // Используем upsert, чтобы гарантированно создать запись, если её нет
-                const { error } = await supabaseClient.from('profiles').upsert({
-                    id: user.uid || user.id, 
-                    updated_at: new Date(),
-                    username: username,
-                    full_name: fullName,
-                    avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${username}&background=6366f1&color=fff&bold=true`
-                }, { onConflict: 'id' });
-
-                if (error) {
-                    console.error("AuthSystem Error: Ошибка при записи в профиль", error);
-                } else {
-                    console.log("AuthSystem: Данные успешно синхронизированы с Supabase.");
+            // Синхронизация профиля в Firestore ( artifacts/{appId}/public/data/profiles/{uid} )
+            syncToFirestore: async (user, customData = {}) => {
+                const username = (customData.username || user.displayName || user.email.split('@')[0]).toLowerCase().replace(/[^a-z0-9]/g, '');
+                const fullName = customData.fullName || user.displayName || 'Nexus Explorer';
+                
+                const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
+                
+                try {
+                    await profileRef.set({
+                        id: user.uid,
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        username: username,
+                        full_name: fullName,
+                        avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${username}&background=6366f1&color=fff&bold=true`,
+                        email: user.email,
+                        status: 'verified'
+                    }, { merge: true });
+                    console.log("System: Firestore sync complete.");
+                } catch (e) {
+                    console.error("System Error: Firestore fail", e);
                 }
-                return !error;
             },
 
-            handleSubmit: async (e) => {
+            handleForm: async (e) => {
                 e.preventDefault();
                 UI.showLoading();
+                
                 const email = document.getElementById('auth-email').value;
                 const password = document.getElementById('auth-password').value;
                 const username = document.getElementById('reg-username').value;
@@ -337,118 +469,96 @@
 
                 try {
                     if (AuthManager.isLoginMode) {
-                        await fbAuth.signInWithEmailAndPassword(email, password);
+                        await auth.signInWithEmailAndPassword(email, password);
                     } else {
-                        const res = await fbAuth.createUserWithEmailAndPassword(email, password);
-                        // Обновляем профиль Firebase
-                        await res.user.updateProfile({ displayName: username });
-                        // Принудительно создаем запись в Supabase
-                        await AuthManager.syncProfile(res.user, { username, fullName });
-                        // Убираем перезагрузку, пусть onAuthStateChanged всё сделает сам
+                        const cred = await auth.createUserWithEmailAndPassword(email, password);
+                        await cred.user.updateProfile({ displayName: username });
+                        await AuthManager.syncToFirestore(cred.user, { username, fullName });
                     }
                 } catch (err) {
-                    alert("Ошибка: " + err.message);
-                    UI.toggleView(false);
+                    alert("Auth Failure: " + err.message);
+                    UI.hideLoading();
                 }
             },
 
             googleLogin: async () => {
                 try {
-                    // Используем поп-ап, он закроется автоматически при успешном входе
-                    await fbAuth.signInWithPopup(googleProvider);
+                    // Firebase поп-ап закроется сам и вызовет onAuthStateChanged
+                    await auth.signInWithPopup(googleProvider);
                 } catch (err) {
-                    if (err.code !== 'auth/popup-closed-by-user') {
-                        alert("Google Error: " + err.message);
-                    }
+                    if (err.code !== 'auth/popup-closed-by-user') alert(err.message);
                 }
-            },
-
-            initYandex: () => {
-                if (!window.YaAuthSuggest) { 
-                    setTimeout(AuthManager.initYandex, 500); 
-                    return; 
-                }
-                window.YaAuthSuggest.init(
-                    { client_id: CONFIG.YANDEX.clientId, response_type: "code", redirect_uri: CONFIG.YANDEX.redirectUri },
-                    window.location.origin,
-                    { view: "button", parentId: "buttonContainerId", buttonSize: 'm', buttonTheme: 'light', buttonBorderRadius: "20", buttonIcon: 'ya' }
-                )
-                .then(result => result.handler())
-                .then(async data => {
-                    // Для Supabase используем редирект текущего окна, чтобы избежать "сайта в поп-апе"
-                    // RedirectUri уже настроен на callback Supabase
-                    await supabaseClient.auth.signInWithOAuth({ 
-                        provider: 'yandex', 
-                        options: { redirectTo: window.location.href } 
-                    });
-                }).catch(e => console.log('Yandex skip'));
             },
 
             logout: async () => {
                 UI.showLoading();
-                await fbAuth.signOut();
-                await supabaseClient.auth.signOut();
-                // После выхода можно обновить страницу для очистки всех стейтов
+                await auth.signOut();
                 window.location.reload();
             }
         };
 
-        async function fetchAndDisplayProfile(uid, email) {
-            console.log("AuthSystem: Загрузка профиля из БД для", uid);
-            const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
+        /**
+         * 4. ЗАГРУЗКА ДАННЫХ ДЛЯ ДАШБОРДА
+         */
+        async function renderDashboard(user) {
+            console.log("System: Rendering expanded profile for", user.uid);
             
-            if (profile) {
-                document.getElementById('p-username').innerText = "@" + profile.username;
-                document.getElementById('p-fullname').innerText = profile.full_name || "—";
-                document.getElementById('user-avatar').src = profile.avatar_url;
-            } else {
-                console.log("AuthSystem: Профиль не найден в БД, пытаемся создать...");
-                const currentUser = fbAuth.currentUser;
-                // Если юзера нет в Firebase, значит он пришел из Supabase (Яндекс)
-                if (currentUser) {
-                    await AuthManager.syncProfile(currentUser);
-                } else {
-                    const { data: { user } } = await supabaseClient.auth.getUser();
-                    if (user) {
-                        await AuthManager.syncProfile(user);
-                    }
+            const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
+            
+            try {
+                const doc = await profileRef.get();
+                let profileData = doc.exists ? doc.data() : null;
+
+                if (!profileData) {
+                    // Если записи нет, создаем её "на лету"
+                    await AuthManager.syncToFirestore(user);
+                    const freshDoc = await profileRef.get();
+                    profileData = freshDoc.data();
                 }
-                // Пробуем загрузить еще раз после попытки создания
-                const { data: retryProfile } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
-                if (retryProfile) {
-                    document.getElementById('p-username').innerText = "@" + retryProfile.username;
-                    document.getElementById('p-fullname').innerText = retryProfile.full_name || "—";
-                    document.getElementById('user-avatar').src = retryProfile.avatar_url;
-                }
+
+                // Заполняем поля Дашборда
+                document.getElementById('hello-name').innerText = profileData.full_name.split(' ')[0];
+                document.getElementById('nav-username').innerText = "@" + profileData.username;
+                document.getElementById('dash-username').innerText = "@" + profileData.username;
+                document.getElementById('dash-fullname').innerText = profileData.full_name;
+                document.getElementById('dash-email').innerText = profileData.email;
+                document.getElementById('dash-uid').innerText = profileData.id;
+
+                const avatarSrc = profileData.avatar_url;
+                document.getElementById('nav-avatar').src = avatarSrc;
+                document.getElementById('user-avatar').src = avatarSrc;
+
+                UI.switchView(true);
+            } catch (err) {
+                console.error("System: Dashboard render error", err);
+                UI.switchView(false);
             }
-            
-            document.getElementById('p-email').innerText = email;
-            document.getElementById('p-uid').innerText = uid;
-            UI.toggleView(true);
         }
 
-        // ОСНОВНОЙ СЛУШАТЕЛЬ СОСТОЯНИЙ
-        fbAuth.onAuthStateChanged(async user => {
+        /**
+         * 5. ОСНОВНОЙ СЛУШАТЕЛЬ СОСТОЯНИЯ (CORE OBSERVER)
+         */
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                console.log("AuthSystem: Обнаружена сессия Firebase");
-                await fetchAndDisplayProfile(user.uid, user.email);
+                console.log("System: Auth State [CONNECTED]");
+                await renderDashboard(user);
             } else {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (session) {
-                    console.log("AuthSystem: Обнаружена сессия Supabase");
-                    await fetchAndDisplayProfile(session.user.id, session.user.email);
-                } else {
-                    console.log("AuthSystem: Сессия не найдена, показываем вход");
-                    UI.toggleView(false);
-                    AuthManager.initYandex();
-                }
+                console.log("System: Auth State [DISCONNECTED]");
+                UI.switchView(false);
             }
         });
 
+        /**
+         * ЭКСПОРТ ДЛЯ ТЕГОВ HTML
+         */
         window.switchAuthMode = AuthManager.switchMode;
-        window.handleAuthSubmit = AuthManager.handleSubmit;
+        window.handleAuthSubmit = AuthManager.handleForm;
         window.signInWithGoogle = AuthManager.googleLogin;
         window.globalLogout = AuthManager.logout;
+        
+        // Инициализация иконок при старте
+        lucide.createIcons();
+
     </script>
 </body>
 </html>
