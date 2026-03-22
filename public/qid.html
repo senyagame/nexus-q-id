@@ -172,8 +172,7 @@
 
             <div class="flex flex-col gap-2 mt-2">
                 <button type="button" class="flex items-center justify-center gap-3 w-full p-3 border border-gray-200 rounded-[20px] font-semibold text-sm hover:bg-gray-50 transition" onclick="signInWithGoogle()">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18" alt="Google">
-                    Google
+                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18"> Google
                 </button>
                 
                 <div id="buttonContainerId"></div>
@@ -202,18 +201,18 @@
             </div>
 
             <div class="info-row">
-                <div class="info-label">Nexus ID</div>
+                <div class="info-label">ID (UUID)</div>
                 <div id="profile-uid" class="info-value text-[10px] opacity-40">—</div>
             </div>
 
-            <button onclick="firebase.auth().signOut()" class="mt-8 text-red-500 text-sm font-bold hover:opacity-70 transition cursor-pointer">
+            <button id="btn-global-logout" class="mt-8 text-red-500 text-sm font-bold hover:opacity-70 transition cursor-pointer">
                 Выйти из системы
             </button>
         </div>
     </div>
 
     <script>
-        // 1. КОНФИГУРАЦИЯ СЕРВИСОВ
+        // 1. КОНФИГУРАЦИЯ
         const firebaseConfig = {
             apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
             authDomain: "nexus-q-ceb47.firebaseapp.com",
@@ -226,36 +225,36 @@
         const supabaseUrl = 'https://vfynermzgdtqmvnbzkah.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmeW5lcm16Z2R0cW12bmJ6a2FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2OTg3NTksImV4cCI6MjA4ODI3NDc1OX0.dM9nBDrEYctP8sNJiUTV4lczM_sq0G480-IQt6fw094';
 
-        // Инициализация
+        // Инициализация сервисов
         firebase.initializeApp(firebaseConfig);
         const fbAuth = firebase.auth();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-        // 2. СИНХРОНИЗАЦИЯ С SUPABASE
-        async function syncProfileToSupabase(user, username = '', fullname = '') {
-            const { error } = await supabaseClient
+        // 2. СИНХРОНИЗАЦИЯ С ТАБЛИЦЕЙ PROFILES
+        async function syncToSupabase(user, username = '', fullName = '') {
+            const { error } = await supabase
                 .from('profiles')
                 .upsert({
-                    id: user.uid,
+                    id: user.uid || user.id, // UID из Firebase или ID из Supabase
                     updated_at: new Date(),
                     username: username || user.displayName || user.email.split('@')[0],
-                    full_name: fullname || user.displayName || '',
+                    full_name: fullName || user.displayName || '',
                     avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=6366f1&color=fff`
                 });
 
-            if (error) console.error('Supabase Sync Error:', error);
+            if (error) console.error('Ошибка синхронизации Profiles:', error);
         }
 
-        // 3. ЛОГИКА ЯНДЕКС ID
+        // 3. ИНИЦИАЛИЗАЦИЯ ЯНДЕКСА (SDK)
         window.onload = function() {
-            const yandexRedirectUri = "https://nexus-q-site.vercel.app/qid.html";
+            // Твой Redirect URL для Supabase
+            const supabaseRedirect = "https://vfynermzgdtqmvnbzkah.supabase.co/auth/v1/callback";
 
             window.YaAuthSuggest.init(
                 {
                     client_id: "7b84bc72719444d9bc04d72106619f4a",
-                    response_type: "token",
-                    redirect_uri: yandexRedirectUri
+                    response_type: "code", // Для Supabase лучше использовать code
+                    redirect_uri: supabaseRedirect
                 },
                 window.location.origin,
                 {
@@ -269,26 +268,28 @@
                 }
             )
             .then(result => result.handler())
-            .then(data => {
-                console.log('Yandex Token:', data.access_token);
-                // Тут можно добавить логику создания профиля на основе данных Яндекса
+            .then(async data => {
+                // Если Яндекс вернул данные, инициируем вход через OAuth в Supabase
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'yandex',
+                    options: { redirectTo: window.location.href }
+                });
+                if (error) console.error('Supabase Yandex Error:', error.message);
             })
-            .catch(error => console.log('Yandex Error:', error));
+            .catch(err => console.log('Yandex SDK Error:', err));
         };
 
-        // 4. ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ (ВХОД / РЕГ)
+        // 4. ЛОГИКА АВТОРИЗАЦИИ (FIREBASE)
         let isLoginMode = true;
         function switchAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById('auth-title').innerText = isLoginMode ? "Войти в QID" : "Создать QID";
             document.getElementById('btn-submit-form').innerText = isLoginMode ? "Войти" : "Зарегистрироваться";
             document.getElementById('reg-fields-container').style.display = isLoginMode ? "none" : "block";
-            document.getElementById('toggle-text-label').innerText = isLoginMode ? "Нет аккаунта?" : "Уже есть аккаунт?";
             document.getElementById('toggle-link-btn').innerText = isLoginMode ? "Создать QID" : "Войти";
         }
 
-        // 5. ОБРАБОТКА ФОРМЫ (FIREBASE)
-        document.getElementById('auth-form').onsubmit = async function(e) {
+        document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -301,54 +302,60 @@
                 } else {
                     const res = await fbAuth.createUserWithEmailAndPassword(email, password);
                     await res.user.updateProfile({ displayName: username });
-                    await syncProfileToSupabase(res.user, username, fullname);
+                    await syncToSupabase(res.user, username, fullname);
                     window.location.reload();
                 }
-            } catch (err) {
-                alert(err.message);
-            }
+            } catch (err) { alert(err.message); }
         };
 
-        // 6. GOOGLE AUTH
         async function signInWithGoogle() {
             try {
-                const res = await fbAuth.signInWithPopup(googleProvider);
-                await syncProfileToSupabase(res.user);
-            } catch (err) {
-                alert(err.message);
-            }
+                const res = await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+                await syncToSupabase(res.user);
+            } catch (err) { alert(err.message); }
         }
 
-        // 7. СЛУШАТЕЛЬ СОСТОЯНИЯ И ЗАГРУЗКА ИЗ БАЗЫ
-        fbAuth.onAuthStateChanged(async (user) => {
-            const authSec = document.getElementById('auth-section');
-            const profSec = document.getElementById('profile-section');
+        // 5. ВЫХОД (ГЛОБАЛЬНЫЙ)
+        document.getElementById('btn-global-logout').onclick = async () => {
+            await fbAuth.signOut();
+            await supabase.auth.signOut();
+            window.location.reload();
+        };
 
+        // 6. СЛУШАТЕЛЬ СОСТОЯНИЯ И ЗАГРУЗКА ПРОФИЛЯ
+        async function updateProfileUI(userUid, userEmail) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userUid)
+                .single();
+
+            if (profile) {
+                document.getElementById('profile-display-name').innerText = "@" + profile.username;
+                document.getElementById('profile-full-name').innerText = profile.full_name || "—";
+                document.getElementById('user-avatar-img').src = profile.avatar_url;
+            }
+            document.getElementById('profile-email').innerText = userEmail;
+            document.getElementById('profile-uid').innerText = userUid;
+        }
+
+        // Проверка сессии Firebase
+        fbAuth.onAuthStateChanged(async user => {
             if (user) {
-                authSec.style.display = "none";
-                profSec.style.display = "block";
-
-                // Загружаем данные из таблицы profiles (Supabase)
-                const { data: profile, error } = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.uid)
-                    .single();
-
-                if (profile) {
-                    document.getElementById('profile-display-name').innerText = "@" + (profile.username || "user");
-                    document.getElementById('profile-full-name').innerText = profile.full_name || "—";
-                    document.getElementById('user-avatar-img').src = profile.avatar_url;
-                } else {
-                    // Если профиля в базе нет (например, старый юзер), создаем его
-                    await syncProfileToSupabase(user);
-                }
-
-                document.getElementById('profile-email').innerText = user.email;
-                document.getElementById('profile-uid').innerText = user.uid;
+                document.getElementById('auth-section').style.display = "none";
+                document.getElementById('profile-section').style.display = "block";
+                await updateProfileUI(user.uid, user.email);
             } else {
-                authSec.style.display = "block";
-                profSec.style.display = "none";
+                // Если в Firebase нет юзера, проверяем Supabase (для Яндекса)
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    document.getElementById('auth-section').style.display = "none";
+                    document.getElementById('profile-section').style.display = "block";
+                    await updateProfileUI(session.user.id, session.user.email);
+                } else {
+                    document.getElementById('auth-section').style.display = "block";
+                    document.getElementById('profile-section').style.display = "none";
+                }
             }
         });
     </script>
