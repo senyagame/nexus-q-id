@@ -169,7 +169,7 @@
 
             <div class="flex flex-col gap-2 mt-2">
                 <button type="button" class="flex items-center justify-center gap-3 w-full p-3 border border-gray-200 rounded-[20px] font-semibold text-sm hover:bg-gray-50 transition" onclick="signInWithGoogle()">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18" alt="Google">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="18">
                     Google
                 </button>
                 
@@ -193,12 +193,7 @@
                 <div id="profile-email" class="info-value">—</div>
             </div>
 
-            <div class="info-row">
-                <div class="info-label">Nexus ID</div>
-                <div id="profile-uid" class="info-value text-[10px] opacity-40">—</div>
-            </div>
-
-            <button onclick="signOutUser()" class="mt-8 text-red-500 text-sm font-bold hover:opacity-70 transition cursor-pointer">
+            <button onclick="firebase.auth().signOut()" class="mt-8 text-red-500 text-sm font-bold hover:opacity-70 transition cursor-pointer">
                 Выйти из аккаунта
             </button>
         </div>
@@ -215,18 +210,19 @@
             appId: "1:1089083193362:web:77d047bc1770f14d7080cb"
         };
 
-        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const firebaseAuth = firebase.auth();
-        const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
 
-        // 2. ИНИЦИАЛИЗАЦИЯ ЯНДЕКС ID
+        // 2. ИНИЦИАЛИЗАЦИЯ ЯНДЕКС ID (ДЛЯ VERCEL)
         window.onload = function() {
+            // Формируем чистый Redirect URI без лишних символов
+            const currentRedirectUri = window.location.origin + window.location.pathname;
+
             window.YaAuthSuggest.init(
                 {
                     client_id: "7b84bc72719444d9bc04d72106619f4a",
                     response_type: "token",
-                    redirect_uri: window.location.href
+                    redirect_uri: currentRedirectUri
                 },
                 window.location.origin,
                 {
@@ -239,132 +235,59 @@
                     buttonIcon: 'ya',
                 }
             )
-            .then(function(result) {
-                return result.handler();
+            .then(result => result.handler())
+            .then(data => {
+                console.log('Яндекс токен получен:', data);
+                alert("Вход через Яндекс выполнен!");
             })
-            .then(function(data) {
-                console.log('Данные Яндекса получены:', data);
-                processYandexAuth(data);
-            })
-            .catch(function(error) {
-                console.log('Ошибка Яндекс SDK:', error);
-            });
+            .catch(error => console.log('Ошибка Яндекса:', error));
         };
 
-        // Обработка данных после входа через Яндекс
-        function processYandexAuth(data) {
-            // В данном примере мы просто имитируем вход. 
-            // В продакшене тут обычно идет обмен токена на данные пользователя.
-            alert("Вы успешно авторизованы через Яндекс ID!");
-            console.log("Access Token:", data.access_token);
-        }
-
-        // 3. ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ВХОД / РЕГИСТРАЦИЯ
+        // 3. ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ
         let currentModeIsLogin = true;
-
         function switchAuthMode() {
             currentModeIsLogin = !currentModeIsLogin;
-            
-            const titleElement = document.getElementById('auth-title');
-            const submitBtn = document.getElementById('btn-submit-form');
-            const regFields = document.getElementById('reg-fields-container');
-            const toggleText = document.getElementById('toggle-text-label');
-            const toggleBtn = document.getElementById('toggle-link-btn');
-
-            if (currentModeIsLogin) {
-                titleElement.innerText = "Войти в QID";
-                submitBtn.innerText = "Войти";
-                regFields.style.display = "none";
-                toggleText.innerText = "Нет аккаунта?";
-                toggleBtn.innerText = "Создать QID";
-            } else {
-                titleElement.innerText = "Создать QID";
-                submitBtn.innerText = "Зарегистрироваться";
-                regFields.style.display = "block";
-                toggleText.innerText = "Уже есть аккаунт?";
-                toggleBtn.innerText = "Войти";
-            }
+            document.getElementById('auth-title').innerText = currentModeIsLogin ? "Войти в QID" : "Создать QID";
+            document.getElementById('btn-submit-form').innerText = currentModeIsLogin ? "Войти" : "Зарегистрироваться";
+            document.getElementById('reg-fields-container').style.display = currentModeIsLogin ? "none" : "block";
+            document.getElementById('toggle-text-label').innerText = currentModeIsLogin ? "Нет аккаунта?" : "Уже есть аккаунт?";
+            document.getElementById('toggle-link-btn').innerText = currentModeIsLogin ? "Создать QID" : "Войти";
         }
 
-        // 4. ОБРАБОТКА ФОРМЫ (ВХОД И РЕГИСТРАЦИЯ)
-        const authForm = document.getElementById('auth-form');
-        authForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const emailValue = document.getElementById('auth-email').value;
-            const passwordValue = document.getElementById('auth-password').value;
-            const usernameValue = document.getElementById('reg-username').value;
+        // 4. FIREBASE AUTH
+        document.getElementById('auth-form').onsubmit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const username = document.getElementById('reg-username').value;
 
             if (currentModeIsLogin) {
-                // Вход
-                firebaseAuth.signInWithEmailAndPassword(emailValue, passwordValue)
-                    .catch(function(error) {
-                        alert("Ошибка входа: " + error.message);
-                    });
+                firebaseAuth.signInWithEmailAndPassword(email, password).catch(err => alert(err.message));
             } else {
-                // Регистрация
-                firebaseAuth.createUserWithEmailAndPassword(emailValue, passwordValue)
-                    .then(function(userCredential) {
-                        // После создания аккаунта обновляем имя пользователя (логин)
-                        return userCredential.user.updateProfile({
-                            displayName: usernameValue
-                        });
-                    })
-                    .then(function() {
-                        alert("Аккаунт QID успешно создан!");
-                        window.location.reload();
-                    })
-                    .catch(function(error) {
-                        alert("Ошибка регистрации: " + error.message);
-                    });
+                firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .then(res => res.user.updateProfile({ displayName: username }))
+                    .then(() => location.reload())
+                    .catch(err => alert(err.message));
             }
-        });
+        };
 
-        // 5. ВХОД ЧЕРЕЗ GOOGLE
         function signInWithGoogle() {
-            firebaseAuth.signInWithPopup(googleAuthProvider)
-                .catch(function(error) {
-                    alert("Ошибка Google: " + error.message);
-                });
+            firebaseAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => alert(err.message));
         }
 
-        // 6. ВЫХОД ИЗ СИСТЕМЫ
-        function signOutUser() {
-            firebaseAuth.signOut()
-                .then(function() {
-                    console.log("Пользователь вышел");
-                })
-                .catch(function(error) {
-                    alert("Ошибка при выходе: " + error.message);
-                });
-        }
-
-        // 7. СЛУШАТЕЛЬ СОСТОЯНИЯ АВТОРИЗАЦИИ
-        firebaseAuth.onAuthStateChanged(function(user) {
-            const authSection = document.getElementById('auth-section');
-            const profileSection = document.getElementById('profile-section');
-
+        // 5. МОНИТОРИНГ СОСТОЯНИЯ
+        firebaseAuth.onAuthStateChanged(user => {
+            const authSec = document.getElementById('auth-section');
+            const profSec = document.getElementById('profile-section');
             if (user) {
-                // Пользователь вошел
-                authSection.style.display = "none";
-                profileSection.style.display = "block";
-
-                document.getElementById('profile-display-name').innerText = user.displayName ? "@" + user.displayName : "@nexus_user";
+                authSec.style.display = "none";
+                profSec.style.display = "block";
+                document.getElementById('profile-display-name').innerText = "@" + (user.displayName || "user");
                 document.getElementById('profile-email').innerText = user.email;
-                document.getElementById('profile-uid').innerText = user.uid;
-                
-                // Установка аватарки (из Google или генерация по имени)
-                const avatarImg = document.getElementById('user-avatar-img');
-                if (user.photoURL) {
-                    avatarImg.src = user.photoURL;
-                } else {
-                    const nameForAvatar = user.displayName || user.email;
-                    avatarImg.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(nameForAvatar) + "&background=6366f1&color=fff&bold=true";
-                }
+                document.getElementById('user-avatar-img').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=6366f1&color=fff&bold=true`;
             } else {
-                // Пользователь не авторизован
-                authSection.style.display = "block";
-                profileSection.style.display = "none";
+                authSec.style.display = "block";
+                profSec.style.display = "none";
             }
         });
     </script>
