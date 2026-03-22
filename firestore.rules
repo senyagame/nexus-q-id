@@ -1,12 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-    // Правило для твоих профилей
+  match /databases/nexusqid/documents { // Тут должно быть имя твоей базы!
     match /artifacts/{appId}/public/data/profiles/{userId} {
-      // Читать профиль может любой (чтобы он был публичным)
       allow read: if true;
-      
-      // Создавать и редактировать может только авторизованный владелец этого ID
       allow write: if request.auth != null && request.auth.uid == userId;
     }
   }
