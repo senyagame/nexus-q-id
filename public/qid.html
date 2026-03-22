@@ -331,7 +331,7 @@
          * SUPABASE CONFIGURATION
          */
         const SUPABASE_URL = 'https://vfynermzgdtqmvnbzkah.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_jvyqjTwOccvBHj7-3IU6mQ_iyOFe9I_zEw...'; // Вставь свой полный ключ отсюда
+        const SUPABASE_KEY = 'sb_publishable_jvYqjTwOcCvBHj7-3IU6mQ_iyOFesK9';
         
         const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -365,6 +365,9 @@
                 document.getElementById('toggle-btn').innerText = isL ? "Создать QID" : "Войти";
                 document.getElementById('toggle-label').innerText = isL ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
             },
+            /**
+             * Supabase: Синхронизация данных профиля
+             */
             syncProfile: async (user, extra = {}) => {
                 const username = (extra.username || user.user_metadata?.username || user.email.split('@')[0])
                                   .toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -387,6 +390,9 @@
                 }
                 return true;
             },
+            /**
+             * Supabase: Обработка формы логина/регистрации
+             */
             handleForm: async (e) => {
                 e.preventDefault();
                 UI.showLoader();
@@ -397,10 +403,7 @@
 
                 try {
                     if (AuthManager.isLogin) {
-                        const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
-                        /**
-                         * Если Supabase вернул ошибку, выкидываем её в catch
-                         */
+                        const { error } = await client.auth.signInWithPassword({ email, password: pass });
                         if (error) throw error;
                     } else {
                         const { data, error } = await client.auth.signUp({ 
@@ -412,11 +415,7 @@
                         if (data.user) await AuthManager.syncProfile(data.user, { username: user, fullName: name });
                     }
                 } catch (err) { 
-                    /**
-                     * Здесь прилетит уведомление "Invalid login credentials", 
-                     * если пользователя нет или пароль не тот.
-                     */
-                    alert("Ошибка авторизации: " + err.message); 
+                    alert("Ошибка: " + err.message); 
                     UI.hideLoader(); 
                 }
             },
@@ -459,6 +458,9 @@
             });
         };
 
+        /**
+         * Supabase: Загрузка данных из таблицы profiles
+         */
         async function loadDashboard(user) {
             try {
                 const { data, error } = await client
@@ -490,6 +492,9 @@
             }
         }
 
+        /**
+         * Supabase: Отслеживание состояния сессии
+         */
         client.auth.onAuthStateChange((event, session) => {
             if (session?.user) {
                 loadDashboard(session.user);
