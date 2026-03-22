@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QID | Dashboard NEXUS-Q</title>
 
-    <!-- Библиотеки стилей и иконок -->
+    <!-- UI Frameworks & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -21,12 +22,18 @@
             --nexus-secondary: #a855f7;
             --accent-yellow: #ffcc00;
             --bg-dark: #0f172a;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #475569;
+            --slate-900: #0f172a;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            background-color: #f8fafc;
+            background-color: var(--slate-50);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -57,7 +64,7 @@
         }
 
         .input-nexus {
-            border: 1.5px solid #e2e8f0;
+            border: 1.5px solid var(--slate-200);
             background-color: #ffffff;
         }
         .input-nexus:focus {
@@ -81,10 +88,14 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            border-radius: 12px;
-            color: #64748b;
+            border-radius: 14px;
+            color: var(--slate-600);
             font-weight: 600;
             cursor: pointer;
+        }
+        .sidebar-item:hover {
+            background-color: var(--slate-100);
+            color: var(--nexus-primary);
         }
         .sidebar-item.active {
             background-color: #eff6ff;
@@ -93,9 +104,9 @@
 
         .dashboard-card {
             background: #ffffff;
-            border-radius: 24px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 28px;
+            border: 1px solid var(--slate-100);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
         }
 
         .hidden-view { display: none !important; }
@@ -109,10 +120,18 @@
         }
         .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Стили модального окна */
         .modal-overlay {
             background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -129,31 +148,31 @@
             <div class="view-transition">
                 <div class="flex items-center gap-3 mb-12">
                     <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/20">
-                        <span class="font-black text-2xl">Q</span>
+                        <span class="font-black text-2xl text-white">Q</span>
                     </div>
-                    <span class="font-bold text-2xl tracking-tighter">NEXUS-Q</span>
+                    <span class="font-bold text-2xl tracking-tighter text-white">NEXUS-Q</span>
                 </div>
-                <div class="space-y-8 max-w-lg">
+                <div class="space-y-8 max-w-lg text-white">
                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 backdrop-blur-md">
                         <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
                         <span class="text-indigo-200 text-xs font-bold tracking-widest uppercase">Next Gen Ecosystem</span>
                     </div>
-                    <h1 class="text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
+                    <h1 class="text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight text-white">
                         Единый <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">профиль</span> <br>для будущего.
                     </h1>
                     <p class="text-xl text-indigo-100/60 leading-relaxed font-medium">
-                        QID — это твой цифровой ключ ко всей экосистеме нейросетей и инструментов NEXUS-Q.
+                        QID — это ваш цифровой паспорт в экосистему NEXUS-Q. Безопасность и удобство в одном месте.
                     </p>
                 </div>
             </div>
-            <div class="flex items-center gap-6 view-transition">
+            <div class="flex items-center gap-6 view-transition" style="animation-delay: 0.1s;">
                 <div class="flex -space-x-4">
-                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-indigo-500 flex items-center justify-center font-bold text-xs">A</div>
-                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-purple-500 flex items-center justify-center font-bold text-xs">S</div>
-                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-blue-500 flex items-center justify-center font-bold text-xs text-white">N</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-indigo-500 flex items-center justify-center font-bold text-white text-xs">A</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-purple-500 flex items-center justify-center font-bold text-white text-xs">S</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-blue-500 flex items-center justify-center font-bold text-white text-xs">N</div>
                 </div>
                 <div class="h-10 w-px bg-white/10"></div>
-                <p class="text-sm text-indigo-200/60 font-medium">15,000+ пользователей <br>уже в системе</p>
+                <p class="text-sm text-indigo-200/60 font-medium text-white">15,000+ пользователей <br>уже в системе</p>
             </div>
         </div>
 
@@ -161,12 +180,12 @@
             <div class="w-full max-w-md p-4 lg:p-8 view-transition">
                 <div class="text-center mb-10">
                     <h2 id="auth-title" class="text-4xl font-black text-slate-900 mb-3 tracking-tight">Войти в QID</h2>
-                    <p id="auth-desc" class="text-slate-400 font-medium text-sm">Авторизуйтесь, чтобы продолжить работу</p>
+                    <p id="auth-desc" class="text-slate-400 font-medium text-sm">Авторизуйтесь в NEXUS-Q</p>
                 </div>
                 <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                     <div id="reg-fields" class="hidden space-y-4">
-                        <input type="text" id="reg-username" placeholder="Придумайте логин" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
-                        <input type="text" id="reg-fullname" placeholder="Ваше Имя" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
+                        <input type="text" id="reg-username" placeholder="Логин" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
+                        <input type="text" id="reg-fullname" placeholder="Полное имя" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
                     </div>
                     <div class="space-y-3">
                         <input type="email" id="auth-email" placeholder="Email адрес" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" required>
@@ -182,7 +201,7 @@
                 </div>
                 <div class="relative flex items-center my-10">
                     <div class="flex-grow border-t border-slate-100"></div>
-                    <span class="flex-shrink mx-6 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">Социальные сети</span>
+                    <span class="flex-shrink mx-6 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">Продолжить через</span>
                     <div class="flex-grow border-t border-slate-100"></div>
                 </div>
                 <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 p-4 border-2 border-slate-100 rounded-2xl font-bold text-sm text-slate-700 hover:bg-slate-50 transition-all">
@@ -200,7 +219,7 @@
         <header class="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-50">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">Q</div>
-                <span class="font-bold text-xl text-slate-900 tracking-tight text-white md:text-slate-900">NEXUS-Q <span class="text-indigo-500 font-medium ml-1">Dashboard</span></span>
+                <span class="font-bold text-xl text-slate-900 tracking-tight">NEXUS-Q <span class="text-indigo-500 font-medium ml-1">Dashboard</span></span>
             </div>
             <div class="flex items-center gap-3 bg-slate-50 p-1.5 pr-4 rounded-full border border-slate-100">
                 <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-white shadow-sm object-cover" alt="User">
@@ -234,57 +253,60 @@
                                 <img id="dash-avatar" src="" alt="Avatar">
                             </div>
                             <div>
-                                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Управление профилем</h1>
-                                <p class="text-slate-500 font-medium">Это ваш персональный QID в системе NEXUS-Q.</p>
+                                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Управление аккаунтом</h1>
+                                <p class="text-slate-500 font-medium text-sm md:text-base">Ваш персональный QID в NEXUS-Q.</p>
                             </div>
                         </div>
-                        <button onclick="openEditModal()" class="px-6 py-3 btn-nexus text-white rounded-2xl text-sm font-bold shadow-lg">Обновить данные</button>
+                        <button onclick="openEditModal()" class="px-8 py-3.5 btn-nexus text-white rounded-2xl text-sm font-bold shadow-lg">Обновить данные</button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Карточка данных -->
+                        <!-- Данные пользователя -->
                         <div class="dashboard-card p-8">
                             <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-8">
                                 <i data-lucide="fingerprint" class="w-5 h-5 text-indigo-500"></i>
-                                Персональные данные
+                                Данные профиля
                             </h3>
                             <div class="space-y-6">
                                 <div>
-                                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Никнейм в системе</label>
-                                    <p id="dash-username" class="text-lg font-bold text-indigo-600">@username</p>
+                                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Никнейм</label>
+                                    <p id="dash-username" class="text-lg font-bold text-indigo-600 tracking-tight">@username</p>
                                 </div>
                                 <div>
-                                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Полное имя</label>
-                                    <p id="dash-fullname" class="text-lg font-bold text-slate-900">—</p>
+                                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Имя</label>
+                                    <p id="dash-fullname" class="text-lg font-bold text-slate-900 tracking-tight">—</p>
                                 </div>
                                 <div>
-                                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Основная почта</label>
+                                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Почта</label>
                                     <p id="dash-email" class="text-lg font-medium text-slate-600">—</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Nexus ID -->
+                        <!-- Nexus ID и Безопасность -->
                         <div class="dashboard-card p-8 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                                     <i data-lucide="shield-check" class="w-5 h-5 text-indigo-500"></i>
                                     Безопасность QID
                                 </h3>
-                                <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
-                                    <div class="flex items-center gap-3 text-green-700">
-                                        <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                        <span class="font-bold text-sm">Верифицирован</span>
+                                <div class="p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white shadow-sm">
+                                        <i data-lucide="check" class="w-5 h-5"></i>
                                     </div>
-                                    <p class="text-[11px] text-green-600/70 mt-1 ml-8">Nexus-Shield: Active</p>
+                                    <div>
+                                        <p class="font-bold text-green-700 text-sm">Верифицирован</p>
+                                        <p class="text-[11px] text-green-600/70">Nexus-Shield: Active</p>
+                                    </div>
                                 </div>
                             </div>
+                            
                             <div class="mt-8">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Nexus ID (UUID)</label>
-                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
-                                    <code id="dash-uid" class="text-xs font-mono text-slate-500 truncate">ID</code>
-                                    <button onclick="copyUid()" title="Копировать ID" class="p-2 hover:bg-slate-200 rounded-lg transition-colors">
-                                        <i data-lucide="copy" class="w-4 h-4 text-slate-400"></i>
+                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between gap-4">
+                                    <code id="dash-uid" class="text-xs font-mono text-slate-500 truncate flex-1 tracking-wider">ID</code>
+                                    <button onclick="copyUid()" class="p-2.5 bg-white border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 rounded-xl shadow-sm transition-all" title="Копировать ID">
+                                        <i data-lucide="copy" class="w-4 h-4"></i>
                                     </button>
                                 </div>
                             </div>
@@ -295,38 +317,46 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: РЕДАКТИРОВАНИЕ -->
+    <!-- MODAL: UPDATE PROFILE -->
     <div id="edit-modal" class="fixed inset-0 z-[100] modal-overlay hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl view-transition">
-            <h2 class="text-2xl font-black text-slate-900 mb-6 tracking-tight">Редактировать данные</h2>
-            <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Никнейм</label>
-                    <input type="text" id="edit-username" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" placeholder="username">
+        <div class="bg-white w-full max-w-md rounded-[32px] p-10 shadow-2xl modal-content">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Редактирование</h2>
+                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form onsubmit="handleUpdateProfile(event)" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Новый никнейм</label>
+                    <input type="text" id="edit-username" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" placeholder="например: nexus_hero">
                 </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Полное имя</label>
+                <div class="space-y-2">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ваше имя</label>
                     <input type="text" id="edit-fullname" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" placeholder="Имя Фамилия">
                 </div>
-                <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="closeEditModal()" class="flex-1 p-4 rounded-2xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Отмена</button>
-                    <button type="submit" class="flex-2 px-8 p-4 rounded-2xl btn-nexus text-white font-bold text-sm shadow-xl">Сохранить</button>
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 p-4 rounded-2xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200">Отмена</button>
+                    <button type="submit" class="flex-[2] p-4 rounded-2xl btn-nexus text-white font-bold text-sm shadow-xl">Сохранить изменения</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ЭКРАН ЗАГРУЗКИ -->
+    <!-- GLOBAL LOADER -->
     <div id="app-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
         <div class="w-14 h-14 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
         <div class="flex items-center gap-3 opacity-50">
             <span class="w-6 h-6 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">Q</span>
-            <p class="text-slate-500 font-bold tracking-widest uppercase text-[10px]">Nexus Auth System</p>
+            <p class="text-slate-500 font-bold tracking-widest uppercase text-[10px]">Nexus Authorization</p>
         </div>
     </div>
 
     <script>
-        const CONFIG = {
+        /**
+         * INITIALIZATION & CONFIG
+         */
+        const firebaseConfig = {
             apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
             authDomain: "nexus-q-ceb47.firebaseapp.com",
             projectId: "nexus-q-ceb47",
@@ -337,45 +367,57 @@
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexus-q-qid';
         
-        firebase.initializeApp(CONFIG);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
         const UI = {
-            authView: document.getElementById('auth-view'),
-            dashView: document.getElementById('dashboard-view'),
+            auth: document.getElementById('auth-view'),
+            dash: document.getElementById('dashboard-view'),
             loader: document.getElementById('app-loader'),
             modal: document.getElementById('edit-modal'),
-            showLoader: () => UI.loader.classList.remove('hidden-view'),
-            hideLoader: () => UI.loader.classList.add('hidden-view'),
-            renderView: (isLoggedIn) => {
+            
+            showLoading: () => UI.loader.classList.remove('hidden-view'),
+            hideLoading: () => UI.loader.classList.add('hidden-view'),
+            
+            render: (isLoggedIn) => {
                 if (isLoggedIn) {
-                    UI.authView.classList.add('hidden-view');
-                    UI.dashView.classList.remove('hidden-view');
+                    UI.auth.classList.add('hidden-view');
+                    UI.dash.classList.remove('hidden-view');
                 } else {
-                    UI.authView.classList.remove('hidden-view');
-                    UI.dashView.classList.add('hidden-view');
+                    UI.auth.classList.remove('hidden-view');
+                    UI.dash.classList.add('hidden-view');
                 }
-                UI.hideLoader();
+                UI.hideLoading();
                 lucide.createIcons();
             }
         };
 
+        /**
+         * AUTHENTICATION & FIRESTORE MANAGER
+         */
         const AuthManager = {
             isLogin: true,
+            
             toggleMode: () => {
                 AuthManager.isLogin = !AuthManager.isLogin;
-                document.getElementById('auth-title').innerText = AuthManager.isLogin ? "Войти в QID" : "Создать QID";
+                const isL = AuthManager.isLogin;
+                document.getElementById('auth-title').innerText = isL ? "Войти в QID" : "Создать QID";
                 document.getElementById('reg-fields').classList.toggle('hidden');
-                document.getElementById('toggle-btn').innerText = AuthManager.isLogin ? "Создать QID" : "Войти";
-                document.getElementById('toggle-label').innerText = AuthManager.isLogin ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
+                document.getElementById('toggle-btn').innerText = isL ? "Создать QID" : "Войти";
+                document.getElementById('toggle-label').innerText = isL ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
             },
+
+            // Синхронизация данных с Firestore: artifacts/{appId}/public/data/profiles/{uid}
             syncProfile: async (user, extra = {}) => {
                 const username = (extra.username || user.displayName || user.email.split('@')[0])
                                   .toLowerCase().replace(/[^a-z0-9]/g, '');
                 const fullName = extra.fullName || user.displayName || 'Пользователь Nexus';
+                
+                // Firestore автоматически создаст коллекцию profiles при первой записи
                 const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
+                
                 try {
                     await profileRef.set({
                         id: user.uid,
@@ -385,15 +427,21 @@
                         avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${username}&background=6366f1&color=fff&bold=true`,
                         email: user.email
                     }, { merge: true });
-                } catch (e) { console.error("Firestore sync error", e); }
+                    return true;
+                } catch (e) {
+                    console.error("Firestore sync error:", e);
+                    return false;
+                }
             },
+
             handleForm: async (e) => {
                 e.preventDefault();
-                UI.showLoader();
+                UI.showLoading();
                 const email = document.getElementById('auth-email').value;
                 const pass = document.getElementById('auth-password').value;
                 const user = document.getElementById('reg-username').value;
                 const name = document.getElementById('reg-fullname').value;
+                
                 try {
                     if (AuthManager.isLogin) {
                         await auth.signInWithEmailAndPassword(email, pass);
@@ -402,48 +450,69 @@
                         await cred.user.updateProfile({ displayName: user });
                         await AuthManager.syncProfile(cred.user, { username: user, fullName: name });
                     }
-                } catch (err) { alert("Ошибка: " + err.message); UI.hideLoader(); }
+                } catch (err) {
+                    alert("Ошибка: " + err.message);
+                    UI.hideLoading();
+                }
             },
+
             google: async () => {
                 try { await auth.signInWithPopup(googleProvider); } 
                 catch (err) { if (err.code !== 'auth/popup-closed-by-user') alert(err.message); }
             },
-            logout: async () => { UI.showLoader(); await auth.signOut(); window.location.reload(); }
+
+            logout: async () => { UI.showLoading(); await auth.signOut(); window.location.reload(); }
         };
 
-        // Функции модального окна
+        /**
+         * PROFILE & DASHBOARD FUNCTIONS
+         */
         window.openEditModal = () => {
             const currentName = document.getElementById('dash-fullname').innerText;
             const currentUsername = document.getElementById('dash-username').innerText.replace('@', '');
-            document.getElementById('edit-fullname').value = currentName === '—' ? '' : currentName;
-            document.getElementById('edit-username').value = currentUsername === 'username' ? '' : currentUsername;
+            document.getElementById('edit-fullname').value = (currentName === '—' || currentName === 'Не указано') ? '' : currentName;
+            document.getElementById('edit-username').value = (currentUsername === 'username') ? '' : currentUsername;
             UI.modal.classList.remove('hidden');
         };
+
         window.closeEditModal = () => UI.modal.classList.add('hidden');
 
         window.handleUpdateProfile = async (e) => {
             e.preventDefault();
-            const newUsername = document.getElementById('edit-username').value;
-            const newFullname = document.getElementById('edit-fullname').value;
+            const newUsername = document.getElementById('edit-username').value.trim();
+            const newFullname = document.getElementById('edit-fullname').value.trim();
             const user = auth.currentUser;
+            
             if (user) {
-                UI.showLoader();
-                await AuthManager.syncProfile(user, { username: newUsername, fullName: newFullname });
-                await loadDashboard(user);
-                window.closeEditModal();
-                UI.hideLoader();
+                UI.showLoading();
+                const success = await AuthManager.syncProfile(user, { username: newUsername, fullName: newFullname });
+                if (success) {
+                    await loadDashboard(user);
+                    window.closeEditModal();
+                } else {
+                    alert("Не удалось сохранить изменения. Убедитесь, что база данных Firestore создана.");
+                }
+                UI.hideLoading();
             }
         };
 
         window.copyUid = () => {
             const uidText = document.getElementById('dash-uid').innerText;
-            const el = document.createElement('textarea');
-            el.value = uidText;
-            document.body.appendChild(el);
-            el.select();
+            const tempInput = document.createElement('textarea');
+            tempInput.value = uidText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
             document.execCommand('copy');
-            document.body.removeChild(el);
-            alert("Nexus ID скопирован!");
+            document.body.removeChild(tempInput);
+            
+            const btn = document.querySelector('[onclick="copyUid()"]');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>';
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = originalIcon;
+                lucide.createIcons();
+            }, 2000);
         };
 
         async function loadDashboard(user) {
@@ -451,35 +520,46 @@
             try {
                 const doc = await profileRef.get();
                 let data = doc.exists ? doc.data() : null;
+
                 if (!data) {
                     await AuthManager.syncProfile(user);
                     const freshDoc = await profileRef.get();
-                    data = freshDoc.data();
+                    data = freshDoc.data() || {
+                        username: user.email.split('@')[0],
+                        full_name: user.displayName || 'Пользователь Nexus',
+                        avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=User`,
+                        id: user.uid,
+                        email: user.email
+                    };
                 }
+
                 document.getElementById('nav-username').innerText = "@" + data.username;
                 document.getElementById('dash-username').innerText = "@" + data.username;
                 document.getElementById('dash-fullname').innerText = data.full_name || 'Не указано';
                 document.getElementById('dash-email').innerText = data.email;
                 document.getElementById('dash-uid').innerText = data.id;
+
                 const avatar = data.avatar_url;
                 document.getElementById('nav-avatar').src = avatar;
                 document.getElementById('dash-avatar').src = avatar;
-                UI.renderView(true);
+
+                UI.render(true);
             } catch (err) {
-                console.warn("Firestore error fallback", err);
-                UI.renderView(true);
+                console.error("Dashboard Load Error:", err);
+                UI.render(true); 
             }
         }
 
         auth.onAuthStateChanged(async (user) => {
             if (user) await loadDashboard(user);
-            else UI.renderView(false);
+            else UI.render(false);
         });
 
         window.switchAuthMode = AuthManager.toggleMode;
         window.handleAuthSubmit = AuthManager.handleForm;
         window.signInWithGoogle = AuthManager.google;
         window.globalLogout = AuthManager.logout;
+        
         lucide.createIcons();
     </script>
 </body>
