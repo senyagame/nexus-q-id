@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase SDK (Используем только Firebase для стабильности) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -31,10 +31,8 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Плавные переходы */
         * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* Анимация появления контента */
         .view-transition {
             animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -44,7 +42,6 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* Стили блока авторизации */
         .hero-gradient {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
             position: relative;
@@ -59,7 +56,6 @@
             pointer-events: none;
         }
 
-        /* Поля ввода */
         .input-nexus {
             border: 1.5px solid #e2e8f0;
             background-color: #ffffff;
@@ -70,7 +66,6 @@
             outline: none;
         }
 
-        /* Кнопки */
         .btn-nexus {
             background: linear-gradient(to right, var(--nexus-primary), var(--nexus-secondary));
             box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);
@@ -81,7 +76,6 @@
             box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4);
         }
 
-        /* Стили дашборда */
         .sidebar-item {
             display: flex;
             align-items: center;
@@ -91,10 +85,6 @@
             color: #64748b;
             font-weight: 600;
             cursor: pointer;
-        }
-        .sidebar-item:hover {
-            background-color: #f1f5f9;
-            color: var(--nexus-primary);
         }
         .sidebar-item.active {
             background-color: #eff6ff;
@@ -110,7 +100,6 @@
 
         .hidden-view { display: none !important; }
 
-        /* Аватар в круге */
         .avatar-frame {
             width: 80px; height: 80px;
             border-radius: 50%;
@@ -120,6 +109,12 @@
         }
         .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
 
+        /* Стили модального окна */
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
@@ -127,10 +122,9 @@
 <body>
 
     <!-- ========================================== -->
-    <!-- VIEW: AUTHENTICATION (Вход / Регистрация) -->
+    <!-- VIEW: AUTHENTICATION                       -->
     <!-- ========================================== -->
     <div id="auth-view" class="min-h-screen flex flex-col md:flex-row hidden-view">
-        <!-- Левый Hero Блок -->
         <div class="hidden md:flex md:w-1/2 hero-gradient p-16 flex-col justify-between text-white relative">
             <div class="view-transition">
                 <div class="flex items-center gap-3 mb-12">
@@ -139,7 +133,6 @@
                     </div>
                     <span class="font-bold text-2xl tracking-tighter">NEXUS-Q</span>
                 </div>
-                
                 <div class="space-y-8 max-w-lg">
                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 backdrop-blur-md">
                         <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
@@ -153,145 +146,108 @@
                     </p>
                 </div>
             </div>
-
-            <div class="flex items-center gap-6 view-transition" style="animation-delay: 0.1s;">
+            <div class="flex items-center gap-6 view-transition">
                 <div class="flex -space-x-4">
-                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-indigo-500 flex items-center justify-center font-bold">A</div>
-                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-purple-500 flex items-center justify-center font-bold">S</div>
-                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-blue-500 flex items-center justify-center font-bold">N</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-indigo-500 flex items-center justify-center font-bold text-xs">A</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-purple-500 flex items-center justify-center font-bold text-xs">S</div>
+                    <div class="w-12 h-12 rounded-full border-4 border-indigo-950 bg-blue-500 flex items-center justify-center font-bold text-xs text-white">N</div>
                 </div>
                 <div class="h-10 w-px bg-white/10"></div>
                 <p class="text-sm text-indigo-200/60 font-medium">15,000+ пользователей <br>уже в системе</p>
             </div>
         </div>
 
-        <!-- Правая Форма -->
         <div class="w-full md:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
             <div class="w-full max-w-md p-4 lg:p-8 view-transition">
                 <div class="text-center mb-10">
                     <h2 id="auth-title" class="text-4xl font-black text-slate-900 mb-3 tracking-tight">Войти в QID</h2>
-                    <p id="auth-desc" class="text-slate-400 font-medium">Авторизуйтесь, чтобы продолжить работу</p>
+                    <p id="auth-desc" class="text-slate-400 font-medium text-sm">Авторизуйтесь, чтобы продолжить работу</p>
                 </div>
-
                 <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                     <div id="reg-fields" class="hidden space-y-4">
                         <input type="text" id="reg-username" placeholder="Придумайте логин" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
                         <input type="text" id="reg-fullname" placeholder="Ваше Имя" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm">
                     </div>
-
                     <div class="space-y-3">
                         <input type="email" id="auth-email" placeholder="Email адрес" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" required>
                         <input type="password" id="auth-password" placeholder="Пароль" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" required>
                     </div>
-
-                    <button type="submit" id="btn-submit" class="w-full p-4 mt-2 rounded-2xl btn-nexus text-white font-bold text-base tracking-wide shadow-2xl">
-                        Войти
-                    </button>
+                    <button type="submit" id="btn-submit" class="w-full p-4 mt-2 rounded-2xl btn-nexus text-white font-bold text-base tracking-wide shadow-2xl">Войти</button>
                 </form>
-
                 <div class="mt-8 text-center">
                     <p class="text-sm text-slate-400 font-medium">
                         <span id="toggle-label">Ещё нет аккаунта?</span>
                         <button onclick="switchAuthMode()" id="toggle-btn" class="text-indigo-600 font-bold hover:text-indigo-700 ml-1 transition">Создать QID</button>
                     </p>
                 </div>
-
                 <div class="relative flex items-center my-10">
                     <div class="flex-grow border-t border-slate-100"></div>
                     <span class="flex-shrink mx-6 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">Социальные сети</span>
                     <div class="flex-grow border-t border-slate-100"></div>
                 </div>
-
-                <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 p-4 border-2 border-slate-100 rounded-2xl font-bold text-sm text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all">
+                <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-4 p-4 border-2 border-slate-100 rounded-2xl font-bold text-sm text-slate-700 hover:bg-slate-50 transition-all">
                     <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" width="20" alt="G">
-                    Продолжить с Google
+                    Google Account
                 </button>
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- VIEW: DASHBOARD (Расширенный Профиль)      -->
+    <!-- VIEW: DASHBOARD                            -->
     <!-- ========================================== -->
     <div id="dashboard-view" class="min-h-screen flex flex-col hidden-view">
-        <!-- Шапка -->
         <header class="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-50">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">Q</div>
-                <span class="font-bold text-xl text-slate-900 tracking-tight">NEXUS-Q <span class="text-indigo-500 font-medium ml-1">Dashboard</span></span>
+                <span class="font-bold text-xl text-slate-900 tracking-tight text-white md:text-slate-900">NEXUS-Q <span class="text-indigo-500 font-medium ml-1">Dashboard</span></span>
             </div>
-            
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-3 bg-slate-50 p-1.5 pr-4 rounded-full border border-slate-100">
-                    <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-white shadow-sm object-cover" alt="User">
-                    <div class="text-left hidden sm:block">
-                        <p id="nav-username" class="text-xs font-bold text-slate-900 leading-none">@user</p>
-                        <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mt-1">Verified ID</p>
-                    </div>
+            <div class="flex items-center gap-3 bg-slate-50 p-1.5 pr-4 rounded-full border border-slate-100">
+                <img id="nav-avatar" src="" class="w-8 h-8 rounded-full border border-white shadow-sm object-cover" alt="User">
+                <div class="text-left hidden sm:block">
+                    <p id="nav-username" class="text-xs font-bold text-slate-900 leading-none">@user</p>
+                    <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mt-1">Verified ID</p>
                 </div>
             </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
-            <!-- Сайдбар -->
             <aside class="hidden lg:flex w-72 bg-white border-r border-slate-100 p-6 flex-col justify-between">
                 <div class="space-y-2">
                     <div class="sidebar-item active">
                         <i data-lucide="user" class="w-5 h-5"></i>
                         Мой профиль
                     </div>
-                    <div class="sidebar-item">
-                        <i data-lucide="zap" class="w-5 h-5"></i>
-                        Активность
-                    </div>
-                    <div class="sidebar-item">
-                        <i data-lucide="shield" class="w-5 h-5"></i>
-                        Безопасность
-                    </div>
-                    <div class="sidebar-item">
-                        <i data-lucide="database" class="w-5 h-5"></i>
-                        Данные
-                    </div>
-                    <div class="sidebar-item">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                        Настройки
-                    </div>
                 </div>
-
                 <button onclick="globalLogout()" class="sidebar-item text-red-500 hover:bg-red-50 hover:text-red-600 mt-auto">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                     Выйти из QID
                 </button>
             </aside>
 
-            <!-- Основной контент (Профиль) -->
             <main class="flex-1 overflow-y-auto p-6 lg:p-10 bg-slate-50/30">
                 <div class="max-w-4xl mx-auto space-y-8 view-transition">
-                    
-                    <!-- Приветственный блок -->
+                    <!-- Хедер профиля -->
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
                         <div class="flex items-center gap-6">
                             <div class="avatar-frame shadow-xl shadow-indigo-100">
                                 <img id="dash-avatar" src="" alt="Avatar">
                             </div>
                             <div>
-                                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Привет, <span id="hello-name">Сень</span>! 👋</h1>
-                                <p class="text-slate-500 font-medium">Это твой расширенный аккаунт в системе NEXUS-Q.</p>
+                                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Управление профилем</h1>
+                                <p class="text-slate-500 font-medium">Это ваш персональный QID в системе NEXUS-Q.</p>
                             </div>
                         </div>
-                        <button class="px-6 py-3 btn-nexus text-white rounded-2xl text-sm font-bold shadow-lg">Обновить данные</button>
+                        <button onclick="openEditModal()" class="px-6 py-3 btn-nexus text-white rounded-2xl text-sm font-bold shadow-lg">Обновить данные</button>
                     </div>
 
-                    <!-- Сетка с информацией -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Карточка данных -->
                         <div class="dashboard-card p-8">
-                            <div class="flex items-center justify-between mb-8">
-                                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                    <i data-lucide="fingerprint" class="w-5 h-5 text-indigo-500"></i>
-                                    Персональные данные
-                                </h3>
-                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-8">
+                                <i data-lucide="fingerprint" class="w-5 h-5 text-indigo-500"></i>
+                                Персональные данные
+                            </h3>
                             <div class="space-y-6">
                                 <div>
                                     <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Никнейм в системе</label>
@@ -308,7 +264,7 @@
                             </div>
                         </div>
 
-                        <!-- Статус и ID -->
+                        <!-- Nexus ID -->
                         <div class="dashboard-card p-8 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
@@ -318,38 +274,49 @@
                                 <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
                                     <div class="flex items-center gap-3 text-green-700">
                                         <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                        <span class="font-bold text-sm">Аккаунт верифицирован</span>
+                                        <span class="font-bold text-sm">Верифицирован</span>
                                     </div>
-                                    <p class="text-[11px] text-green-600/70 mt-1 ml-8">Ваш профиль защищен протоколом Nexus-Shield</p>
+                                    <p class="text-[11px] text-green-600/70 mt-1 ml-8">Nexus-Shield: Active</p>
                                 </div>
                             </div>
-                            
                             <div class="mt-8">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Nexus ID (UUID)</label>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
-                                    <code id="dash-uid" class="text-xs font-mono text-slate-500 truncate">UUID-TOKEN</code>
-                                    <i data-lucide="copy" class="w-4 h-4 text-slate-300 cursor-pointer hover:text-indigo-500"></i>
+                                    <code id="dash-uid" class="text-xs font-mono text-slate-500 truncate">ID</code>
+                                    <button onclick="copyUid()" title="Копировать ID" class="p-2 hover:bg-slate-200 rounded-lg transition-colors">
+                                        <i data-lucide="copy" class="w-4 h-4 text-slate-400"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Дополнительная информация -->
-                    <div class="dashboard-card p-8 bg-slate-900 text-white overflow-hidden relative">
-                        <div class="absolute -right-10 -bottom-10 opacity-10">
-                            <i data-lucide="cpu" class="w-64 h-64"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Добро пожаловать в новую эру</h3>
-                        <p class="text-slate-400 max-w-md">Ваш профиль QID теперь является центром управления всеми вашими нейросетями в инфраструктуре NEXUS-Q. Мы создаем будущее вместе.</p>
-                        <button class="mt-8 px-8 py-3 bg-white text-slate-900 rounded-2xl font-bold text-sm hover:bg-slate-100 transition">Изучить возможности</button>
-                    </div>
-
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Загрузочный экран (Overlay) -->
+    <!-- МОДАЛЬНОЕ ОКНО: РЕДАКТИРОВАНИЕ -->
+    <div id="edit-modal" class="fixed inset-0 z-[100] modal-overlay hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl view-transition">
+            <h2 class="text-2xl font-black text-slate-900 mb-6 tracking-tight">Редактировать данные</h2>
+            <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Никнейм</label>
+                    <input type="text" id="edit-username" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" placeholder="username">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Полное имя</label>
+                    <input type="text" id="edit-fullname" class="w-full p-4 rounded-2xl input-nexus font-medium text-sm" placeholder="Имя Фамилия">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 p-4 rounded-2xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Отмена</button>
+                    <button type="submit" class="flex-2 px-8 p-4 rounded-2xl btn-nexus text-white font-bold text-sm shadow-xl">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ЭКРАН ЗАГРУЗКИ -->
     <div id="app-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center">
         <div class="w-14 h-14 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
         <div class="flex items-center gap-3 opacity-50">
@@ -359,9 +326,6 @@
     </div>
 
     <script>
-        /**
-         * 1. КОНФИГУРАЦИЯ FIREBASE
-         */
         const CONFIG = {
             apiKey: "AIzaSyB8FCa1mDuyrzPTKXL_dNeA5BtQtmK9e50",
             authDomain: "nexus-q-ceb47.firebaseapp.com",
@@ -378,17 +342,13 @@
         const db = firebase.firestore();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-        /**
-         * 2. ЭЛЕМЕНТЫ УПРАВЛЕНИЯ UI
-         */
         const UI = {
             authView: document.getElementById('auth-view'),
             dashView: document.getElementById('dashboard-view'),
             loader: document.getElementById('app-loader'),
-
+            modal: document.getElementById('edit-modal'),
             showLoader: () => UI.loader.classList.remove('hidden-view'),
             hideLoader: () => UI.loader.classList.add('hidden-view'),
-
             renderView: (isLoggedIn) => {
                 if (isLoggedIn) {
                     UI.authView.classList.add('hidden-view');
@@ -398,39 +358,24 @@
                     UI.dashView.classList.add('hidden-view');
                 }
                 UI.hideLoader();
-                lucide.createIcons(); // Перерисовываем иконки
+                lucide.createIcons();
             }
         };
 
-        /**
-         * 3. ЛОГИКА АВТОРИЗАЦИИ (AUTH MANAGER)
-         */
         const AuthManager = {
             isLogin: true,
-
             toggleMode: () => {
                 AuthManager.isLogin = !AuthManager.isLogin;
-                const isL = AuthManager.isLogin;
-                document.getElementById('auth-title').innerText = isL ? "Войти в QID" : "Создать QID";
-                document.getElementById('btn-submit').innerText = isL ? "Войти" : "Создать";
+                document.getElementById('auth-title').innerText = AuthManager.isLogin ? "Войти в QID" : "Создать QID";
                 document.getElementById('reg-fields').classList.toggle('hidden');
-                document.getElementById('toggle-btn').innerText = isL ? "Создать QID" : "Войти";
-                document.getElementById('toggle-label').innerText = isL ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
+                document.getElementById('toggle-btn').innerText = AuthManager.isLogin ? "Создать QID" : "Войти";
+                document.getElementById('toggle-label').innerText = AuthManager.isLogin ? "Ещё нет аккаунта?" : "Уже есть аккаунт?";
             },
-
-            // Синхронизация данных с Firestore
             syncProfile: async (user, extra = {}) => {
-                console.log("System: Попытка синхронизации профиля...");
-                
-                // Формируем чистый логин из почты или переданных данных
                 const username = (extra.username || user.displayName || user.email.split('@')[0])
                                   .toLowerCase().replace(/[^a-z0-9]/g, '');
-                
                 const fullName = extra.fullName || user.displayName || 'Пользователь Nexus';
-                
-                // Путь согласно правилам для Firestore
                 const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
-                
                 try {
                     await profileRef.set({
                         id: user.uid,
@@ -440,22 +385,15 @@
                         avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${username}&background=6366f1&color=fff&bold=true`,
                         email: user.email
                     }, { merge: true });
-                    console.log("System: Профиль успешно синхронизирован.");
-                } catch (e) {
-                    console.error("System Error: Firestore недоступен или не создан.", e.message);
-                    // Ошибка 404 означает, что базу данных Firestore нужно создать в консоли Firebase!
-                }
+                } catch (e) { console.error("Firestore sync error", e); }
             },
-
             handleForm: async (e) => {
                 e.preventDefault();
                 UI.showLoader();
-                
                 const email = document.getElementById('auth-email').value;
                 const pass = document.getElementById('auth-password').value;
                 const user = document.getElementById('reg-username').value;
                 const name = document.getElementById('reg-fullname').value;
-
                 try {
                     if (AuthManager.isLogin) {
                         await auth.signInWithEmailAndPassword(email, pass);
@@ -464,98 +402,85 @@
                         await cred.user.updateProfile({ displayName: user });
                         await AuthManager.syncProfile(cred.user, { username: user, fullName: name });
                     }
-                } catch (err) {
-                    alert("Ошибка: " + err.message);
-                    UI.hideLoader();
-                }
+                } catch (err) { alert("Ошибка: " + err.message); UI.hideLoader(); }
             },
-
             google: async () => {
-                try {
-                    // Firebase Popup сам закроется и обновит состояние auth
-                    await auth.signInWithPopup(googleProvider);
-                } catch (err) {
-                    if (err.code !== 'auth/popup-closed-by-user') alert(err.message);
-                }
+                try { await auth.signInWithPopup(googleProvider); } 
+                catch (err) { if (err.code !== 'auth/popup-closed-by-user') alert(err.message); }
             },
+            logout: async () => { UI.showLoader(); await auth.signOut(); window.location.reload(); }
+        };
 
-            logout: async () => {
+        // Функции модального окна
+        window.openEditModal = () => {
+            const currentName = document.getElementById('dash-fullname').innerText;
+            const currentUsername = document.getElementById('dash-username').innerText.replace('@', '');
+            document.getElementById('edit-fullname').value = currentName === '—' ? '' : currentName;
+            document.getElementById('edit-username').value = currentUsername === 'username' ? '' : currentUsername;
+            UI.modal.classList.remove('hidden');
+        };
+        window.closeEditModal = () => UI.modal.classList.add('hidden');
+
+        window.handleUpdateProfile = async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('edit-username').value;
+            const newFullname = document.getElementById('edit-fullname').value;
+            const user = auth.currentUser;
+            if (user) {
                 UI.showLoader();
-                await auth.signOut();
-                window.location.reload();
+                await AuthManager.syncProfile(user, { username: newUsername, fullName: newFullname });
+                await loadDashboard(user);
+                window.closeEditModal();
+                UI.hideLoader();
             }
         };
 
-        /**
-         * 4. ЗАГРУЗКА ДАННЫХ В ДАШБОРД
-         */
+        window.copyUid = () => {
+            const uidText = document.getElementById('dash-uid').innerText;
+            const el = document.createElement('textarea');
+            el.value = uidText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Nexus ID скопирован!");
+        };
+
         async function loadDashboard(user) {
-            console.log("System: Загрузка расширенного профиля...");
-            
             const profileRef = db.doc(`artifacts/${appId}/public/data/profiles/${user.uid}`);
-            
             try {
                 const doc = await profileRef.get();
                 let data = doc.exists ? doc.data() : null;
-
                 if (!data) {
-                    // Если записи нет в БД (первый вход Google), создаем её
                     await AuthManager.syncProfile(user);
                     const freshDoc = await profileRef.get();
-                    data = freshDoc.exists ? freshDoc.data() : {
-                        username: user.email.split('@')[0],
-                        full_name: user.displayName || 'Nexus User',
-                        avatar_url: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`,
-                        id: user.uid,
-                        email: user.email
-                    };
+                    data = freshDoc.data();
                 }
-
-                // Маппинг данных в UI
-                document.getElementById('hello-name').innerText = (data.full_name || 'Сень').split(' ')[0];
                 document.getElementById('nav-username').innerText = "@" + data.username;
                 document.getElementById('dash-username').innerText = "@" + data.username;
                 document.getElementById('dash-fullname').innerText = data.full_name || 'Не указано';
                 document.getElementById('dash-email').innerText = data.email;
                 document.getElementById('dash-uid').innerText = data.id;
-
                 const avatar = data.avatar_url;
                 document.getElementById('nav-avatar').src = avatar;
                 document.getElementById('dash-avatar').src = avatar;
-
                 UI.renderView(true);
             } catch (err) {
-                console.warn("System: Проблема с Firestore. Показываем базовые данные.", err);
-                // Фолбэк на данные из Auth, если Firestore не настроен
-                document.getElementById('dash-username').innerText = "@" + user.email.split('@')[0];
-                document.getElementById('dash-email').innerText = user.email;
-                document.getElementById('nav-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=User`;
+                console.warn("Firestore error fallback", err);
                 UI.renderView(true);
             }
         }
 
-        /**
-         * 5. СЛУШАТЕЛЬ СОСТОЯНИЯ AUTH
-         */
         auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                console.log("System: Пользователь авторизован.");
-                await loadDashboard(user);
-            } else {
-                console.log("System: Пользователь не в системе.");
-                UI.renderView(false);
-            }
+            if (user) await loadDashboard(user);
+            else UI.renderView(false);
         });
 
-        // Глобальный экспорт функций
         window.switchAuthMode = AuthManager.toggleMode;
         window.handleAuthSubmit = AuthManager.handleForm;
         window.signInWithGoogle = AuthManager.google;
         window.globalLogout = AuthManager.logout;
-        
-        // Старт иконок
         lucide.createIcons();
-
     </script>
 </body>
 </html>
