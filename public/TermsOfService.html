@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | QWORLD</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --bg-dark: #0f172a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .lang-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        h2 {
+            font-size: 19px;
+            font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            color: var(--accent-secondary);
+        }
+
+        p, li {
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        ul {
+            padding-left: 18px;
+            list-style-type: none;
+        }
+
+        li::before {
+            content: "•";
+            color: var(--accent-primary);
+            display: inline-block; 
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .highlight {
+            color: white;
+            font-weight: 600;
+        }
+
+        .lang-section { display: none; }
+        .lang-section.active { display: block; }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #475569;
+            font-size: 12px;
+            padding-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-nav">
+        <div class="brand">NEXUS-Q</div>
+        <div class="flex gap-2">
+            <button id="btn-ru" class="lang-btn active" onclick="switchLang('ru')">RU</button>
+            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">EN</button>
+        </div>
+    </div>
+
+    <section id="content-ru" class="lang-section active">
+        <h1>Пользовательское соглашение</h1>
+        <p class="text-sm italic opacity-50">Последнее обновление: 15 апреля 2026 г.</p>
+        
+        <p>Добро пожаловать в <span class="highlight">QWORLD</span>. Используя наше приложение, вы соглашаетесь с данными условиями. Пожалуйста, прочтите их внимательно.</p>
+
+        <h2>1. Общие положения</h2>
+        <p>Приложение QWORLD предоставляется «как есть». Мы не даем гарантий бесперебойной работы всех сервисов в любое время.</p>
+
+        <h2>2. Использование ИИ (Nexus AI)</h2>
+        <p>Приложение использует нейросети для генерации ответов.</p>
+        <ul>
+            <li><span class="highlight">Точность:</span> ИИ может выдавать ошибочные данные. Перепроверяйте информацию.</li>
+            <li><span class="highlight">Ответственность:</span> NEXUS-Q не несет ответственности за последствия использования ответов ИИ.</li>
+        </ul>
+
+        <h2>3. Обязанности пользователя</h2>
+        <p>Запрещено использовать приложение для нарушения законодательства Республики Казахстан и Российской Федерации или попыток дестабилизации работы серверов.</p>
+
+        <h2>4. Интеллектуальная собственность</h2>
+        <p>Все права на бренд <span class="highlight">NEXUS-Q</span>, дизайн и исходный код приложения защищены и принадлежат разработчику.</p>
+
+        <h2>5. Добровольные пожертвования</h2>
+        <p>Приложение бесплатно. Функция «покормить разработчика» является добровольным пожертвованием на поддержку проекта и не дает прав на владение сервисом.</p>
+
+        <h2>6. Изменение условий</h2>
+        <p>Мы оставляем за собой право обновлять Соглашение. Продолжение использования приложения означает ваше согласие с новой редакцией.</p>
+
+        <footer>
+            <p>© 2026 NEXUS-Q. Все права защищены.</p>
+        </footer>
+    </section>
+
+    <section id="content-en" class="lang-section">
+        <h1>Terms of Service</h1>
+        <p class="text-sm italic opacity-50">Last updated: April 15, 2026</p>
+        
+        <p>By using <span class="highlight">QWORLD</span>, you agree to these terms. Please read them carefully before proceeding.</p>
+
+        <h2>1. Service Terms</h2>
+        <p>QWORLD is provided on an "as is" and "as available" basis. We do not guarantee uninterrupted service.</p>
+
+        <h2>2. AI Disclaimer (Nexus AI)</h2>
+        <ul>
+            <li><span class="highlight">Accuracy:</span> Nexus AI may provide inaccurate or biased information. Always verify important facts.</li>
+            <li><span class="highlight">Liability:</span> NEXUS-Q is not responsible for any actions taken based on AI-generated content.</li>
+        </ul>
+
+        <h2>3. Prohibited Conduct</h2>
+        <p>You agree not to violate any laws of Kazakhstan and Russian Federation or attempt to breach the app's security protocols.</p>
+
+        <h2>4. Intellectual Property</h2>
+        <p>All rights to the <span class="highlight">NEXUS-Q</span> branding, design, and source code are reserved by the developer.</p>
+
+        <h2>5. Voluntary Donations</h2>
+        <p>The app is free. Any financial support (donations) is voluntary and used to support the project development.</p>
+
+        <h2>6. Changes to Terms</h2>
+        <p>We reserve the right to update these terms. Your continued use of the app signifies acceptance of the updated version.</p>
+
+        <footer>
+            <p>© 2026 NEXUS-Q. All rights reserved.</p>
+        </footer>
+    </section>
+</div>
+
+<script>
+    function switchLang(lang) {
+        document.getElementById('content-ru').classList.toggle('active', lang === 'ru');
+        document.getElementById('content-en').classList.toggle('active', lang === 'en');
+        document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    }
+</script>
+
+</body>
+</html>

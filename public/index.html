@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS-Q</title>
     
-    <!-- [ЗАВИСИМОСТИ] -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     
@@ -102,21 +101,18 @@
             box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
         }
 
-        /* Поля ввода */
-        .custom-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid transparent;
-            border-radius: 16px;
-            padding: 16px 20px;
-            color: white;
-            transition: all 0.2s;
-            outline: none;
+        /* Стиль для шагов тестирования */
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s;
         }
 
-        .custom-input:focus {
+        .step-card:hover {
+            background: rgba(255, 255, 255, 0.05);
             border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
         }
 
         /* Полоса прокрутки */
@@ -130,28 +126,23 @@
             background: #334155;
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
     </style>
 </head>
 <body>
 
-    <!-- [ШАПКА САЙТА] -->
     <nav class="fixed top-0 w-full z-50 glass-nav h-20 flex items-center">
         <div class="max-w-7xl mx-auto w-full px-6 flex justify-between items-center">
             <a href="#" class="logo-text">NEXUS-Q</a>
             
-            <div class="hidden md:flex items-center space-x-10">
-                <a href="#services" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Возможности</a>
-                <a href="#qworld" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">QWORLD</a>
-                <a href="#test" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Тестирование</a>
-                <a href="qid.html" class="gradient-btn text-white px-7 py-2.5 rounded-2xl text-sm font-bold">QID</a>
+            <div class="flex items-center space-x-4 md:space-x-10">
+                <a href="#services" class="hidden md:block text-sm font-semibold text-slate-300 hover:text-white transition-colors">Возможности</a>
+                <a href="#qworld" class="hidden md:block text-sm font-semibold text-slate-300 hover:text-white transition-colors">QWORLD</a>
+                <a href="#test" class="hidden md:block text-sm font-semibold text-slate-300 hover:text-white transition-colors">Тестирование</a>
+                <a href="qid.html" class="gradient-btn text-white px-5 md:px-7 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-xs md:text-sm font-bold">QID</a>
             </div>
         </div>
     </nav>
 
-    <!-- [ГЛАВНЫЙ ЭКРАН] -->
     <section class="relative pt-44 pb-24 px-6 overflow-hidden">
         <div class="hero-blob"></div>
         <div class="max-w-5xl mx-auto text-center">
@@ -169,66 +160,53 @@
         </div>
     </section>
 
-    <!-- [ПРЕИМУЩЕСТВА - ОБНОВЛЕНО] -->
     <section id="services" class="py-24 px-6">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Карточка 1 -->
                 <div class="feature-card">
                     <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-8">
-                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
                     </div>
                     <h3 class="text-xl font-bold mb-4 text-white">Умная геолокация</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">Приложение автоматически определяет ваш город и погоду, чтобы ИИ предлагал только актуальные и доступные места поблизости.</p>
                 </div>
-                <!-- Карточка 2 -->
                 <div class="feature-card">
                     <div class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-8">
                         <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <h3 class="text-xl font-bold mb-4 text-white">ИИ-Эксперт Groq</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Используем мощные модели Llama 3.1 через Groq для мгновенной генерации описаний и проверки фактов о достопримечательностях.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">Используем мощные модели Llama 3.1 через Groq для мгновенной генерации описаний и проверки фактов.</p>
                 </div>
-                <!-- Карточка 3 -->
                 <div class="feature-card">
                     <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-8">
-                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2"></path></svg>
                     </div>
                     <h3 class="text-xl font-bold mb-4 text-white">Наглядный формат</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Забудьте про длинные чаты. Мы преобразуем ответы нейросети в удобные блоки с кнопками навигации и детальным описанием.</p>
+                    <p class="text-slate-400 text-sm leading-relaxed">Преобразуем ответы нейросети в удобные блоки с кнопками навигации и детальным описанием.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- [РАЗДЕЛ QWORLD] -->
     <section id="qworld" class="py-24 px-6">
         <div class="max-w-7xl mx-auto">
             <div class="qworld-box p-8 md:p-16 flex flex-col md:flex-row items-center gap-16">
                 <div class="flex-1">
                     <h2 class="text-4xl md:text-5xl font-800 mb-8 leading-tight text-white">Приложение <span class="gradient-text">QWORLD</span></h2>
                     <p class="text-slate-400 text-lg mb-10 leading-relaxed">
-                        В этом приложении мы используем нейросети и вашу геолокацию для поиска популярных и интересных мест в вашем городе, а представляем их вам не в виде текстового помощника, как Gemini или ChatGPT, а в виде <b>разделённых блоков</b>, нажав на которые можно прочитать про это место подробнее или отправиться сразу туда, нажав на открытие карт. <br> <b>Это ваш ИИ Гид по всем городам мира!</b> <br> Новая версия <b>QWORLD 2</b>, позволяет вам легко пользоваться ИИ гидом.
+                        В этом приложении мы используем нейросети и вашу геолокацию для поиска популярных и интересных мест в вашем городе, а представляем их вам не в виде текстового помощника, а в виде <b>разделённых блоков</b>. <br> <b>Это ваш ИИ Гид по всем городам мира!</b>
                     </p>
                     <div class="space-y-4 mb-10 text-slate-300">
                         <div class="flex items-center gap-4 font-semibold">
                             <div class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">✓</div>
-                            Нейросети от Deepseek и Meta с двойной self-check проверкой 
+                            Нейросети от Deepseek и Meta с двойной проверкой
                         </div>
                         <div class="flex items-center gap-4 font-semibold">
                             <div class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">✓</div>
-                            Доступ в любое время
-                        </div>
-                        <div class="flex items-center gap-4 font-semibold">
-                            <div class="w-10 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">✓</div>
-                            Если нет GPS - просто выберите один из городов из списка, который вам предложит приложение.
-                        </div>
-                        <div class="flex items-center gap-4 font-semibold">
-                            <div class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">✓</div>
-                            Доступен закрытый бета-тест приложения
+                            Доступен закрытый бета-тест
                         </div>
                     </div>
-                    <a href="#test" class="gradient-btn text-white px-5 py-4 rounded-2xl font-bold shadow-xl text-center transition-all">Присоединиться к тесту</a>
+                    <a href="#test" class="gradient-btn text-white px-5 py-4 rounded-2xl font-bold shadow-xl">Стать тестером</a>
                 </div>
                 <div class="flex-1 flex justify-center">
                     <canvas id="qworld-canvas" width="450" height="450" class="max-w-full"></canvas>
@@ -237,143 +215,48 @@
         </div>
     </section>
 
-    <!-- [ЗАЯВКА НА ТЕСТИРОВАНИЕ] -->
     <section id="test" class="py-24 px-6 bg-white/[0.02]">
-        <div class="max-w-xl mx-auto text-center">
-            <h2 class="text-4xl font-800 mb-6 text-white">Закрытое тестирование</h2>
-            
-            <!-- Счётчик мест -->
-            <div id="counterBox" class="inline-flex items-center gap-3 px-5 py-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full mb-8 opacity-0 transition-opacity duration-700">
-                <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                <span class="text-xs font-bold tracking-[0.2em] uppercase text-indigo-400">Осталось мест: <span id="spotsCount" class="text-white">--</span> из 30</span>
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-800 mb-6 text-white">Закрытое тестирование</h2>
+                <p class="text-slate-400">Для доступа к приложению QWORLD в Google Play выполните шаги ниже:</p>
             </div>
 
-            <p class="text-slate-400 mb-12">Примите участие в раннем доступе к экосистеме QWORLD. Для регистрации необходима учетная запись Google.</p>
-            
-            <div id="formContainer">
-                <form id="betaForm" class="space-y-4 text-left">
-                    <div class="grid grid-cols-1 gap-4">
-                        <input type="text" name="fullName" id="fullName" placeholder="Имя и Фамилия" class="custom-input" required>
-                        <input type="email" name="email" id="email" placeholder="Электронная почта (@gmail.com)" 
-                               pattern=".+@gmail\.com" 
-                               title="Пожалуйста, используйте почту в домене @gmail.com"
-                               class="custom-input" required>
-                    </div>
-                    <button type="submit" id="submitBtn" class="w-full gradient-btn text-white py-4 rounded-2xl font-bold shadow-lg mt-4 flex items-center justify-center gap-2">
-                        <span id="btnText">Подать заявку</span>
-                        <svg id="loadingIcon" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </button>
-                    <!-- Ссылка на политику -->
-                    <p class="mt-4 text-[10px] text-center text-slate-500 leading-relaxed px-4">
-                        Нажимая кнопку, вы соглашаетесь с условиями 
-                        <a href="privacy.html" class="text-indigo-400 hover:underline">Политики конфиденциальности</a> 
-                        в отношении обработки ваших данных.
-                    </p>
-                </form>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="step-card">
+                    <div class="text-2xl font-800 text-indigo-500 mb-4">Шаг 1</div>
+                    <p class="text-sm text-slate-300 mb-6">Вступите в Google Группу для получения прав тестера:</p>
+                    <a href="https://groups.google.com/g/qworld-nexusq" target="_blank" class="text-indigo-400 font-bold hover:underline">Вступить в группу →</a>
+                </div>
+                <div class="step-card">
+                    <div class="text-2xl font-800 text-purple-500 mb-4">Шаг 2</div>
+                    <p class="text-sm text-slate-300 mb-6">Скачайте приложение в официальном магазине:</p>
+                    <a href="https://play.google.com/store/apps/details?id=com.nexus_q.qworld" target="_blank" class="text-purple-400 font-bold hover:underline">Google Play Store →</a>
+                </div>
             </div>
 
-            <div id="successMsg" class="mt-6 p-8 bg-green-500/10 border border-green-500/20 rounded-3xl text-green-400 font-medium hidden">
-                <p>Заявка успешно отправлена! Ожидайте подтверждения на указанную почту Gmail.</p>
-            </div>
-
-            <div id="closedMsg" class="mt-6 p-8 bg-amber-500/10 border border-amber-500/20 rounded-3xl text-amber-400 font-medium hidden">
-                <p>К сожалению, все 30 мест на закрытое тестирование уже заняты. Следите за обновлениями в Личном кабинете!</p>
-            </div>
-            
-            <div id="errorMsg" class="mt-6 p-6 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 font-medium hidden">
-                <p>Произошла ошибка при отправке. Пожалуйста, проверьте настройки доступа скрипта.</p>
+            <div class="mt-12 p-8 bg-indigo-500/5 border border-indigo-500/20 rounded-3xl">
+                <p class="text-sm text-slate-400 leading-relaxed text-center">
+                    Вам необходимо в течение <span class="text-white font-bold">14 дней</span> заходить в приложение минимум на <span class="text-white font-bold">60 секунд</span>. Буду рад вашим отзывам в Google Play! 😉
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- [ПОДВАЛ САЙТА] -->
     <footer class="py-16 px-6 border-t border-white/5 bg-transparent">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="logo-text">NEXUS-Q</div>
             <div class="flex flex-wrap justify-center gap-6 md:gap-10 text-sm font-semibold text-slate-500">
                 <a href="privacy.html" class="hover:text-indigo-400 transition-colors">Конфиденциальность</a>
-                <a href="#" class="hover:text-indigo-400 transition-colors">Условия</a>
-                <a href="#" class="hover:text-indigo-400 transition-colors">Карьера</a>
+                <a href="TermsOfService.html" class="hover:text-indigo-400 transition-colors">Условия использования</a>
+                <a href="qid.html" class="hover:text-indigo-400 transition-colors">Личный кабинет QID</a>
             </div>
-            <p class="text-xs text-slate-500">&copy; 2026 Компания NEXUS-Q. Все права защищены. Работаем с VK, Яндекс, Google и Groq</p>
+            <p class="text-xs text-slate-500 text-center md:text-right">&copy; 2026 NEXUS-Q. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- [ЛОГИКА САЙТА] -->
     <script>
-        // --- Настройка связи с Google Таблицей ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHOZgj2TICtKTDbpWB8ePLm85nesAEz5mmDzmeAnbJTplQw1mjgfGxYG6au6Eq9siDGw/exec'; 
-
-        const form = document.getElementById('betaForm');
-        const formContainer = document.getElementById('formContainer');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loadingIcon = document.getElementById('loadingIcon');
-        const successMsg = document.getElementById('successMsg');
-        const closedMsg = document.getElementById('closedMsg');
-        const errorMsg = document.getElementById('errorMsg');
-        const spotsCount = document.getElementById('spotsCount');
-        const counterBox = document.getElementById('counterBox');
-
-        async function fetchSpots() {
-            try {
-                const response = await fetch(SCRIPT_URL + '?action=getCount');
-                const data = await response.json();
-                const totalLimit = 30;
-                const currentCount = data.count || 0;
-                const remaining = totalLimit - currentCount;
-
-                spotsCount.textContent = remaining > 0 ? remaining : 0;
-                counterBox.style.opacity = '1';
-
-                if (remaining <= 0) {
-                    formContainer.classList.add('hidden');
-                    closedMsg.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error('Ошибка получения данных:', error);
-            }
-        }
-
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            
-            submitBtn.disabled = true;
-            btnText.textContent = 'Отправка...';
-            loadingIcon.classList.remove('hidden');
-            successMsg.classList.add('hidden');
-            errorMsg.classList.add('hidden');
-
-            const formData = new FormData(form);
-            
-            fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                mode: 'no-cors',
-                body: formData
-            })
-            .then(() => {
-                submitBtn.disabled = false;
-                btnText.textContent = 'Подать заявку';
-                loadingIcon.classList.add('hidden');
-                form.reset();
-                successMsg.classList.remove('hidden');
-                fetchSpots();
-            })
-            .catch(error => {
-                console.error('Ошибка сети!', error.message);
-                submitBtn.disabled = false;
-                btnText.textContent = 'Подать заявку';
-                loadingIcon.classList.add('hidden');
-                errorMsg.classList.remove('hidden');
-            });
-        });
-
         window.onload = function() {
-            fetchSpots();
-
             const canvas = document.getElementById('qworld-canvas');
             const qworldSection = document.getElementById('qworld');
             if (!canvas || !qworldSection) return;
@@ -400,15 +283,12 @@
             observer.observe(qworldSection);
 
             function animate() {
-                const now = Date.now();
                 gradientOffset += 0.003; 
-                
                 if (morphStarted) {
-                    let elapsed = (now - startTime) / 3000; 
+                    let elapsed = (Date.now() - startTime) / 3000; 
                     if (elapsed > 1) elapsed = 1;
                     const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                     let factor = easeInOutCubic(elapsed);
-                    
                     waveIntensity = 0.2 + factor * 0.8;
                     if (elapsed > 0.45) centerText = "2";
                 }
@@ -417,37 +297,23 @@
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
                 const radius = canvas.width / 2.6;
-                const animX = Math.sin(gradientOffset * Math.PI) * 0.5;
-                const animY = Math.cos(gradientOffset * Math.PI) * 0.5;
                 
-                const grd = ctx.createLinearGradient(
-                    centerX * (1 + animX - 1), centerY * (1 + animY - 1), 
-                    centerX * (1 + animX + 1), centerY * (1 + animY + 1)
-                );
+                const grd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
                 grd.addColorStop(0, `rgb(${colorStart.r}, ${colorStart.g}, ${colorStart.b})`);
                 grd.addColorStop(1, `rgb(${colorEnd.r}, ${colorEnd.g}, ${colorEnd.b})`);
 
                 ctx.beginPath();
-                for (let i = 0; i <= 180; i++) {
-                    let angle = (i * 2) * Math.PI / 180;
-                    let wavePhase = gradientOffset * 2 * Math.PI;
-                    let wave = Math.cos(angle * 8 + wavePhase) * (18 * waveIntensity);
-                    let currentRadius = radius + wave;
-                    let x = centerX + currentRadius * Math.cos(angle);
-                    let y = centerY + currentRadius * Math.sin(angle);
+                for (let i = 0; i <= 360; i++) {
+                    let angle = i * Math.PI / 180;
+                    let wave = Math.cos(angle * 8 + gradientOffset * 10) * (18 * waveIntensity);
+                    let x = centerX + (radius + wave) * Math.cos(angle);
+                    let y = centerY + (radius + wave) * Math.sin(angle);
                     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                 }
                 ctx.closePath();
-
-                if (waveIntensity > 0.01) {
-                    ctx.shadowColor = `rgba(${colorStart.r}, ${colorStart.g}, ${colorStart.b}, ${0.5 * waveIntensity})`;
-                    ctx.shadowBlur = 40;
-                    ctx.shadowOffsetY = 15;
-                }
-
                 ctx.fillStyle = grd;
                 ctx.fill();
-                ctx.shadowColor = "transparent";
+
                 ctx.fillStyle = "#ffffff";
                 ctx.font = "800 110px Inter";
                 ctx.textAlign = "center";
